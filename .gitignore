@@ -1,0 +1,6 @@
+
+
+#ignore all the .o files
+*.o
+3DMazeGame
+
