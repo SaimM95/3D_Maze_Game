@@ -76,6 +76,7 @@ void display(void) {
     glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, shiny);
 
 	drawAxis();
+	mazeTerrain.draw();
 
 	glutSwapBuffers();
 }

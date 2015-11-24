@@ -7,6 +7,8 @@ using namespace std;
 
 struct vertex3D {
 	float x, y, z;
+	int faces[4] = {-1,-1,-1,-1};
+	int numFaces = 0;
 
 	void set(float x, float y, float z) {
 		this->x = x;
@@ -14,8 +16,22 @@ struct vertex3D {
 		this->z = z;
 	}
 
+	void addFace(int f) {
+		for (int i = 0; i < 4; ++i) {
+			if (faces[i] == -1) {
+				faces[i] = f;
+				numFaces++;
+				break;
+			}
+		}
+	}
+
 	void show() {
 		printf("%f,%f,%f\n", x, y, z);
+	}
+
+	void showFaces() {
+		printf("Faces: %d,%d,%d,%d\n", faces[0], faces[1], faces[2], faces[3]);
 	}
 };
 
@@ -46,6 +62,8 @@ private:
 	vector<vertex3D>*vertexNormals;
 	void generateMaze();
 	void showMaze();
+	void calcFaceNormals();
+	void calcVertexNormals();
 };
 
 #endif
