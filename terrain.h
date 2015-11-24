@@ -33,6 +33,7 @@ struct faces3D {
 class terrain {
 public:
 	int sizeX, sizeZ, height;
+	int **mazeHeightMap;
 
 	terrain(int sizeX, int sizeZ, int height);
 	void load();
@@ -43,6 +44,8 @@ private:
 	vector<faces3D>*faces;
 	vector<vertex3D>*faceNormals;
 	vector<vertex3D>*vertexNormals;
+	void generateMaze();
+	void showMaze();
 };
 
 #endif
