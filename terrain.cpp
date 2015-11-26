@@ -55,11 +55,8 @@ void terrain::load() {
 	// Set x, y, z values for all the vertices in such a way that it translates into a flat plane of points
 	// i.e. all points have height 0
 	int vertexCount = 0;
-	int heightX, heightZ;
 	for (int x = -sizeX/2; x <= sizeX/2; ++x) {
-		heightX = x + (sizeX/2);
 		for (int z = sizeZ/2; z >= -sizeZ/2; --z) {
-			heightZ = (sizeZ/2) - z;
 			verts->at(vertexCount).set(x,0,z);
 			vertexCount++;
 		}
@@ -74,6 +71,8 @@ void terrain::load() {
 	// Fill the faces vector with vertices in a sequential manner 
 	// (i.e. each 4 vertices that should appear together, correspond to a single polygon)
 	int xCount = 0;
+	int heightX = 0; 
+	int heightZ = 0;
 	for (int f = 0; f < faces->size(); ++f) {
 		if (f > 0 && f%sizeX == 0) xCount++;
 		int v1 = f+sizeZ+1+xCount;
@@ -87,6 +86,19 @@ void terrain::load() {
 		verts->at(v2).addFace(f);
 		verts->at(v3).addFace(f);
 		verts->at(v4).addFace(f);
+
+		printf("heightX:%d heightZ:%d Height:%d\n", heightX, heightZ, mazeHeightMap[heightX][heightZ]);
+
+		verts->at(v1).y = mazeHeightMap[heightX][heightZ];
+		verts->at(v2).y = mazeHeightMap[heightX][heightZ];
+		verts->at(v3).y = mazeHeightMap[heightX][heightZ];
+		verts->at(v4).y = mazeHeightMap[heightX][heightZ];
+
+		heightZ++;
+		if (heightZ >= sizeZ) {
+			heightX++;
+			heightZ = 0;
+		}
 	}
 
 	calcFaceNormals();

@@ -10,3 +10,5 @@ Description:
     - Have player mesh (simple boxes dragging on the floor; no animation needed)
     - Have camera working for first/third person views
     - Have enemies (simple box meshes) that terminate the game if touched by the player mesh
+
+Slack integration test

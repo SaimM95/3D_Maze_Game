@@ -83,7 +83,16 @@ void display(void) {
 
 void special(int key, int x, int y) {
 	switch(key) {
-		
+		case GLUT_KEY_UP:
+			camPos[0] -= 1;
+			camPos[1] -= 1;
+			camPos[2] -= 1;
+			break;
+		case GLUT_KEY_DOWN:
+			camPos[0] += 1;
+			camPos[1] += 1;
+			camPos[2] += 1;
+			break;
 	}
 
 	// Call display function
