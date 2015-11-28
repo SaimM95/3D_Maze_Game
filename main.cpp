@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include "terrain.h"
+#include "camera.h"
 
 #ifdef __APPLE__
 #  include <OpenGL/gl.h>
@@ -14,6 +15,10 @@
 #endif
 
 using namespace std;
+
+#define ShowUpvector
+
+CCamera Camera;
 
 int terrainSizeX = 10;
 int terrainSizeZ = 10;
@@ -62,7 +67,16 @@ void display(void) {
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
-	gluLookAt(camPos[0], camPos[1], camPos[2], camFocus[0],camFocus[1],camFocus[2], upVect[0],upVect[1],upVect[2]);
+	Camera.Render();
+
+	gluLookAt(	Camera.Position.x,Camera.Position.y,Camera.Position.z,
+				Camera.ViewDir.x + Camera.Position.x,Camera.ViewDir.y + Camera.Position.y,Camera.ViewDir.z + Camera.Position.z,
+				Camera.UpVector.x,Camera.UpVector.y,Camera.UpVector.z);
+
+	Camera.showPosition();
+	Camera.showViewPoint();
+
+	// gluLookAt(camPos[0], camPos[1], camPos[2], camFocus[0],camFocus[1],camFocus[2], upVect[0],upVect[1],upVect[2]);
 
 	glColor3f(1,1,1); // White light color
 	glEnable(GL_LIGHT0);
@@ -79,24 +93,31 @@ void display(void) {
 	drawAxis();
 	mazeTerrain.draw();
 
+	glFlush();
 	glutSwapBuffers();
 }
 
 void special(int key, int x, int y) {
+	// int fx = camFocus[0];
+	// int fz = camFocus[2];
+	// int px = camPos[0];
+	// int pz = camPos[2];
+	// float slope = (fz - pz) / (fx - px);
+	// float b = fz - (slope*fx);
+
 	switch(key) {
 		case GLUT_KEY_UP:
-			camPos[0] -= 1;
-			camPos[2] -= 1;
+			Camera.MoveForward( -0.1 );
+			display();
 			break;
 		case GLUT_KEY_DOWN:
-			camPos[0] += 1;
-			camPos[2] += 1;
+			Camera.MoveForward( 0.1 ) ;
 			break;
 		case GLUT_KEY_RIGHT:
-			camFocus[0] += 1;
+			Camera.RotateY(-5.0);
 			break;
 		case GLUT_KEY_LEFT:
-			camFocus[0] -= 1;
+			Camera.RotateY(5.0);
 			break;
 	}
 
@@ -109,13 +130,16 @@ void keyboard(unsigned char key, int x, int y) {
 		case 'q':
 			exit(0);
 			break;
-		case 't':
-			camPos[0] = 0;
-			camPos[2] = 0;
+		case 'w':		
+			// Camera.RotateX(5.0);
+			Camera.ViewDir.y += 0.1;
+			display();
 			break;
-		case 'n':
-			camPos[0] = 50;
-			camPos[2] = 50;
+		case 's':		
+			// Camera.RotateX(-5.0);
+			Camera.ViewDir.y -= 0.1;
+			display();
+			break;
 	}
 }
 
@@ -133,12 +157,28 @@ void init(void)
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	//glOrtho(-2, 2, -2, 2, -2, 2);
-	gluPerspective(45, 1, 1, 400);
+	// gluPerspective(45, 1, 1, 400);
 
 	//enable backface culling
     glFrontFace(GL_CCW);
     glCullFace(GL_BACK);
     glEnable(GL_CULL_FACE);
+}
+
+void reshape(int x, int y)
+{
+	if (y == 0 || x == 0) return;  //Nothing is visible then, so return
+	
+	//Set a new projection matrix
+	glMatrixMode(GL_PROJECTION);  
+	glLoadIdentity();
+	//Angle of view:40 degrees
+	//Near clipping plane distance: 0.5
+	//Far clipping plane distance: 20.0
+	gluPerspective(40.0,(GLdouble)x/(GLdouble)y,0.5,400.0);
+
+	glMatrixMode(GL_MODELVIEW);
+	glViewport(0,0,x,y);  //Use the whole window for rendering
 }
 
 int main(int argc, char** argv) {
@@ -156,7 +196,11 @@ int main(int argc, char** argv) {
 
 	mazeTerrain.load();
 
+	Camera.Move( F3dVector(-4.0, 1.0, 11.0 ));
+	Camera.MoveForward( 1.0 );
+
 	glutDisplayFunc(display);	//registers "display" as the display callback function
+	glutReshapeFunc(reshape);
 	glutKeyboardFunc(keyboard);
 	glutSpecialFunc(special);
 

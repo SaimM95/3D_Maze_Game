@@ -124,7 +124,6 @@ void terrain::draw() {
 		if (mazeHeightMap[heightX][heightZ] == height) {
 			extrudeVal = height;
 
-			glColor3f(0.5,0.9,0);
 			drawWall(v1,v2);
 			drawWall(v2,v3);
 			drawWall(v3,v4);
@@ -274,7 +273,16 @@ void terrain::calcVertexNormals() {
 }
 
 void terrain::drawWall(int v1, int v2) {
+	glColor3f(0.5,0.9,0);
 	glBegin(GL_POLYGON);
+		glVertex3f(verts->at(v1).x, verts->at(v1).y, verts->at(v1).z);
+		glVertex3f(verts->at(v2).x, verts->at(v2).y, verts->at(v2).z);
+		glVertex3f(verts->at(v2).x, verts->at(v2).y + height, verts->at(v2).z);
+		glVertex3f(verts->at(v1).x, verts->at(v1).y + height, verts->at(v1).z);
+	glEnd();
+
+	glColor3f(0,0,1);
+	glBegin(GL_LINE_STRIP);
 		glVertex3f(verts->at(v1).x, verts->at(v1).y, verts->at(v1).z);
 		glVertex3f(verts->at(v2).x, verts->at(v2).y, verts->at(v2).z);
 		glVertex3f(verts->at(v2).x, verts->at(v2).y + height, verts->at(v2).z);
