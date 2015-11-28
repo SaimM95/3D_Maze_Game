@@ -20,7 +20,8 @@ int terrainSizeZ = 10;
 terrain mazeTerrain(terrainSizeX, terrainSizeZ, 5);
 
 float upVect[] = {0,1,0};
-float camPos[] = {100,100,100};
+float camPos[] = {50,0,50};
+float camFocus[] = {0,0,0};
 
 float light_pos[] = {0, 100, 0,1};
  
@@ -61,7 +62,7 @@ void display(void) {
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
-	gluLookAt(camPos[0], camPos[1], camPos[2], 0,0,0, upVect[0],upVect[1],upVect[2]);
+	gluLookAt(camPos[0], camPos[1], camPos[2], camFocus[0],camFocus[1],camFocus[2], upVect[0],upVect[1],upVect[2]);
 
 	glColor3f(1,1,1); // White light color
 	glEnable(GL_LIGHT0);
@@ -85,13 +86,17 @@ void special(int key, int x, int y) {
 	switch(key) {
 		case GLUT_KEY_UP:
 			camPos[0] -= 1;
-			camPos[1] -= 1;
 			camPos[2] -= 1;
 			break;
 		case GLUT_KEY_DOWN:
 			camPos[0] += 1;
-			camPos[1] += 1;
 			camPos[2] += 1;
+			break;
+		case GLUT_KEY_RIGHT:
+			camFocus[0] += 1;
+			break;
+		case GLUT_KEY_LEFT:
+			camFocus[0] -= 1;
 			break;
 	}
 
@@ -104,6 +109,13 @@ void keyboard(unsigned char key, int x, int y) {
 		case 'q':
 			exit(0);
 			break;
+		case 't':
+			camPos[0] = 0;
+			camPos[2] = 0;
+			break;
+		case 'n':
+			camPos[0] = 50;
+			camPos[2] = 50;
 	}
 }
 

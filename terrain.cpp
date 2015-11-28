@@ -87,12 +87,12 @@ void terrain::load() {
 		verts->at(v3).addFace(f);
 		verts->at(v4).addFace(f);
 
-		printf("heightX:%d heightZ:%d Height:%d\n", heightX, heightZ, mazeHeightMap[heightX][heightZ]);
+		// printf("heightX:%d heightZ:%d Height:%d\n", heightX, heightZ, mazeHeightMap[heightX][heightZ]);
 
-		verts->at(v1).y = mazeHeightMap[heightX][heightZ];
-		verts->at(v2).y = mazeHeightMap[heightX][heightZ];
-		verts->at(v3).y = mazeHeightMap[heightX][heightZ];
-		verts->at(v4).y = mazeHeightMap[heightX][heightZ];
+		// verts->at(v1).y = mazeHeightMap[heightX][heightZ];
+		// verts->at(v2).y = mazeHeightMap[heightX][heightZ];
+		// verts->at(v3).y = mazeHeightMap[heightX][heightZ];
+		// verts->at(v4).y = mazeHeightMap[heightX][heightZ];
 
 		heightZ++;
 		if (heightZ >= sizeZ) {
@@ -108,6 +108,10 @@ void terrain::load() {
 // Draw the terrain using glut functions
 void terrain::draw() {
 	int xCount = 0;
+	int heightX = 0; 
+	int heightZ = 0;
+
+	int extrudeVal = 0;
 
 	// use quads or triangles to draw the things in your picture
 	for (int i = 0; i < faces->size(); ++i) {
@@ -117,21 +121,42 @@ void terrain::draw() {
 		int v3 = i+1+xCount;
 		int v4 = i+0+xCount;
 
-		glColor3f(0,1,1);
+		if (mazeHeightMap[heightX][heightZ] == height) {
+			extrudeVal = height;
+
+			glColor3f(0.5,0.9,0);
+			drawWall(v1,v2);
+			drawWall(v2,v3);
+			drawWall(v3,v4);
+			drawWall(v4,v1);
+
+			glColor3f(0.5,0.9,1);
+		}
+		else {
+			extrudeVal = 0;
+			glColor3f(1,0,1);
+		}
+
 	
 		glBegin(GL_POLYGON);
 			glNormal3f(vertexNormals->at(v1).x, vertexNormals->at(v1).y, vertexNormals->at(v1).z);
-			glVertex3f(faces->at(i).v1.x, faces->at(i).v1.y, faces->at(i).v1.z);
+			glVertex3f(faces->at(i).v1.x, faces->at(i).v1.y + extrudeVal, faces->at(i).v1.z);
 
 			glNormal3f(vertexNormals->at(v2).x, vertexNormals->at(v2).y, vertexNormals->at(v2).z);
-			glVertex3f(faces->at(i).v2.x, faces->at(i).v2.y, faces->at(i).v2.z);
+			glVertex3f(faces->at(i).v2.x, faces->at(i).v2.y + extrudeVal, faces->at(i).v2.z);
 
 			glNormal3f(vertexNormals->at(v3).x, vertexNormals->at(v3).y, vertexNormals->at(v3).z);
-			glVertex3f(faces->at(i).v3.x, faces->at(i).v3.y, faces->at(i).v3.z);
+			glVertex3f(faces->at(i).v3.x, faces->at(i).v3.y + extrudeVal, faces->at(i).v3.z);
 
 			glNormal3f(vertexNormals->at(v4).x, vertexNormals->at(v4).y, vertexNormals->at(v4).z);
-			glVertex3f(faces->at(i).v4.x, faces->at(i).v4.y, faces->at(i).v4.z);
+			glVertex3f(faces->at(i).v4.x, faces->at(i).v4.y + extrudeVal, faces->at(i).v4.z);
 		glEnd();
+
+		heightZ++;
+		if (heightZ >= sizeZ) {
+			heightX++;
+			heightZ = 0;
+		}
 	}
 }
 
@@ -145,8 +170,47 @@ void terrain::generateMaze() {
 		}
 	}
 
+	// mazeHeightMap[10][10] = {
+	// 				{5,5,5,5,5,5,5,5,5,5},
+	// 			s->	{0,0,5,0,5,0,0,0,0,5},
+	// 				{5,0,5,0,5,0,5,0,5,5},
+	// 				{5,0,5,0,5,0,5,0,5,5},
+	// 				{5,0,5,0,5,0,0,0,0,5},
+	// 				{5,0,5,0,5,0,5,5,0,5},
+	// 				{5,0,0,0,5,0,5,0,0,5},
+	// 				{5,0,5,0,5,0,5,0,5,5},
+	// 				{5,0,5,0,0,0,5,0,0,0}, <- f
+	// 				{5,5,5,5,5,5,5,5,5,5}
+	// 			};
+
 	// Generate maze walls
 	// ...
+	mazeHeightMap[1][0] = 0;
+	mazeHeightMap[1][2] = 5;
+	mazeHeightMap[2][2] = 5;
+	mazeHeightMap[3][2] = 5;
+	mazeHeightMap[4][2] = 5;
+	mazeHeightMap[5][2] = 5;
+	mazeHeightMap[7][2] = 5;
+	mazeHeightMap[8][2] = 5;
+	mazeHeightMap[1][4] = 5;
+	mazeHeightMap[2][4] = 5;
+	mazeHeightMap[3][4] = 5;
+	mazeHeightMap[4][4] = 5;
+	mazeHeightMap[5][4] = 5;
+	mazeHeightMap[6][4] = 5;
+	mazeHeightMap[7][4] = 5;
+	mazeHeightMap[2][6] = 5;
+	mazeHeightMap[3][6] = 5;
+	mazeHeightMap[5][6] = 5;
+	mazeHeightMap[6][6] = 5;
+	mazeHeightMap[7][6] = 5;
+	mazeHeightMap[8][6] = 5;
+	mazeHeightMap[5][7] = 5;
+	mazeHeightMap[2][8] = 5;
+	mazeHeightMap[3][8] = 5;
+	mazeHeightMap[7][8] = 5;
+	mazeHeightMap[8][9] = 0;
 }
 
 // Private function: Print out the mazeHeightMap array
@@ -207,4 +271,13 @@ void terrain::calcVertexNormals() {
 
 		vertexNormals->at(i).set(aveX,aveY,aveZ);
 	}
+}
+
+void terrain::drawWall(int v1, int v2) {
+	glBegin(GL_POLYGON);
+		glVertex3f(verts->at(v1).x, verts->at(v1).y, verts->at(v1).z);
+		glVertex3f(verts->at(v2).x, verts->at(v2).y, verts->at(v2).z);
+		glVertex3f(verts->at(v2).x, verts->at(v2).y + height, verts->at(v2).z);
+		glVertex3f(verts->at(v1).x, verts->at(v1).y + height, verts->at(v1).z);
+	glEnd();
 }

@@ -64,6 +64,7 @@ private:
 	void showMaze();
 	void calcFaceNormals();
 	void calcVertexNormals();
+	void drawWall(int v1, int v2);
 };
 
 #endif
