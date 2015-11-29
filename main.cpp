@@ -21,6 +21,9 @@ using namespace std;
 
 CCamera Camera;
 
+int windowWidth = 600;
+int windowHeight = 600;
+
 int terrainSizeX = 10;
 int terrainSizeZ = 10;
 terrain mazeTerrain(terrainSizeX, terrainSizeZ, 5);
@@ -44,7 +47,70 @@ bool moveBack = false;
 bool moveForward = false;
 
 float playerHeight = 2.0;
-int yDirCounter = 0;
+int camYDirCounter = 0;
+
+/* TEXTURE */
+GLubyte *img_data;
+int width, height, maximum;
+
+GLubyte* LoadPPM(char* file, int* width, int* height, int* max)
+{
+	GLubyte* img;
+	FILE *fd;
+	int n, m;
+	int  k, nm;
+	char c;
+	int i;
+	char b[100];
+	float s;
+	int red, green, blue;
+	
+	/* first open file and check if it's an ASCII PPM (indicated by P3 at the start) */
+	fd = fopen(file, "r");
+	fscanf(fd,"%[^\n] ",b);
+	if(b[0]!='P'|| b[1] != '3')
+	{
+		printf("%s is not a PPM file!\n",file); 
+		exit(0);
+	}
+	printf("%s is a PPM file\n", file);
+	fscanf(fd, "%c",&c);
+
+	/* next, skip past the comments - any line starting with #*/
+	while(c == '#') 
+	{
+		fscanf(fd, "%[^\n] ", b);
+		printf("%s\n",b);
+		fscanf(fd, "%c",&c);
+	}
+	ungetc(c,fd); 
+
+	/* now get the dimensions and max colour value from the image */
+	fscanf(fd, "%d %d %d", &n, &m, &k);
+
+	printf("%d rows  %d columns  max value= %d\n",n,m,k);
+
+	/* calculate number of pixels and allocate storage for this */
+	nm = n*m;
+	img = (GLubyte*)(malloc(3*sizeof(GLuint)*nm));
+	s=255.0/k;
+
+	/* for every pixel, grab the read green and blue values, storing them in the image data array */
+	for(i=0;i<nm;i++) 
+	{
+		fscanf(fd,"%d %d %d",&red, &green, &blue );
+		img[3*nm-3*i-3]=red*s;
+		img[3*nm-3*i-2]=green*s;
+		img[3*nm-3*i-1]=blue*s;
+	}
+
+	/* finally, set the "return parameters" (width, height, max) and return the image array */
+	*width = n;
+	*height = m;
+	*max = k;
+
+	return img;
+}
 
 void drawAxis() {
 	// Z-axis = Red
@@ -69,6 +135,40 @@ void drawAxis() {
 	glEnd();
 }
 
+// Source: http://guidedhacking.com/showthread.php?6588-OpenGL-Draw-a-crosshair
+void drawCrosshair() {
+    glPushMatrix();
+    glViewport(0, 0, windowWidth, windowHeight);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glOrtho(0, windowWidth, windowHeight, 0, -1, 1);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+
+    glColor3ub(240, 240, 240);//white
+    glLineWidth(2.0);
+    glBegin(GL_LINES);
+    //horizontal line
+    glVertex2i(windowWidth / 2 - 7, windowHeight / 2);
+    glVertex2i(windowWidth / 2 + 7, windowHeight / 2);
+    glEnd();
+    //vertical line
+    glBegin(GL_LINES);
+    glVertex2i(windowWidth / 2, windowHeight / 2 + 7);
+    glVertex2i(windowWidth / 2, windowHeight / 2 - 7);
+    glEnd();
+
+    glPopMatrix();
+
+    //Set a new projection matrix
+    glMatrixMode(GL_PROJECTION);  
+    glLoadIdentity();
+    //Angle of view:40 degrees
+    //Near clipping plane distance: 0.5
+    //Far clipping plane distance: 20.0
+    gluPerspective(40.0,(GLdouble)windowWidth/(GLdouble)windowHeight,0.5,400.0);
+}
+
 void display(void) {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glMatrixMode(GL_MODELVIEW);
@@ -76,9 +176,9 @@ void display(void) {
 
 	Camera.Render();
 
-	gluLookAt(	Camera.Position.x,Camera.Position.y,Camera.Position.z,
-				Camera.ViewDir.x + Camera.Position.x,Camera.ViewDir.y + Camera.Position.y,Camera.ViewDir.z + Camera.Position.z,
-				Camera.UpVector.x,Camera.UpVector.y,Camera.UpVector.z);
+	// gluLookAt(	Camera.Position.x,Camera.Position.y,Camera.Position.z,
+	// 			Camera.ViewDir.x + Camera.Position.x,Camera.ViewDir.y + Camera.Position.y,Camera.ViewDir.z + Camera.Position.z,
+	// 			Camera.UpVector.x,Camera.UpVector.y,Camera.UpVector.z);
 
 	// Camera.showPosition();
 	// Camera.showViewPoint();
@@ -98,7 +198,30 @@ void display(void) {
     glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, shiny);
 
 	drawAxis();
+
+	// glPushMatrix();
+	
+	//do the rotation - rotate about the Y axis by angle ang
+	// glRotatef(ang, 0, 1, 0);
+	
+	//draw the teapot
+	
+	/* MATERIALS */
+	
+	
+	glColor3f(1,0,0);
+	
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); 
+	
+	//pop the matrix back to what it was prior to the rotation
+	// glPopMatrix();
+
 	mazeTerrain.draw();
+
+	drawCrosshair();
 
 	glFlush();
 	glutSwapBuffers();
@@ -118,7 +241,7 @@ void special(int key, int x, int y) {
 			Camera.MoveForward( -1 );
 
 			// Restrict movement along the y-axis (i.e can't fly or go through the ground)
-			if (yDirCounter != 0) {
+			if (camYDirCounter != 0) {
 				printf("PosY:%f PlayerHeight:%f ViewY:%f\n", Camera.Position.y, playerHeight, abs(Camera.ViewDir.y));
 				Camera.MoveForward(1);		// reset pretend move
 				return;
@@ -143,7 +266,7 @@ void special(int key, int x, int y) {
 			Camera.MoveForward( 1 );
 
 			// Restrict movement along the y-axis (i.e can't fly or go through the ground)
-			if (yDirCounter != 0) {
+			if (camYDirCounter != 0) {
 				printf("PosY:%f PlayerHeight:%f ViewY:%f\n", Camera.Position.y, playerHeight, abs(Camera.ViewDir.y));
 				Camera.MoveForward(1);		// reset pretend move
 				return;
@@ -181,22 +304,21 @@ void keyboard(unsigned char key, int x, int y) {
 		case 'w':		
 			// Camera.RotateX(5.0);
 			Camera.ViewDir.y += 0.1;
-			yDirCounter++;
+			camYDirCounter++;
 			printf("ViewY:%f\n", Camera.ViewDir.y*1000000);
 			display();
 			break;
 		case 's':		
 			// Camera.RotateX(-5.0);
 			Camera.ViewDir.y -= 0.1;
-			yDirCounter--;
+			camYDirCounter--;
 			printf("ViewY:%f\n", Camera.ViewDir.y*1000000);
 			display();
 			break;
 	}
 }
 
-void init(void)
-{
+void init(void) {
 	glClearColor(0, 0, 0, 0);
 	glColor3f(1, 1, 1);
 
@@ -217,8 +339,7 @@ void init(void)
     glEnable(GL_CULL_FACE);
 }
 
-void reshape(int x, int y)
-{
+void reshape(int x, int y) {
 	if (y == 0 || x == 0) return;  //Nothing is visible then, so return
 	
 	//Set a new projection matrix
@@ -255,6 +376,16 @@ int main(int argc, char** argv) {
 	glutReshapeFunc(reshape);
 	glutKeyboardFunc(keyboard);
 	glutSpecialFunc(special);
+
+    /* TEXTURES */
+	glEnable(GL_TEXTURE_2D);
+
+	img_data = LoadPPM("marble.ppm", &width, &height, &maximum);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
+				GL_UNSIGNED_BYTE, img_data); 
+
+    // image = LoadPPM("interface.ppm", &width, &height, &max);
 
 	glEnable(GL_DEPTH_TEST);
 	init();

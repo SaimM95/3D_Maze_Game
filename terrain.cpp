@@ -129,13 +129,13 @@ void terrain::draw() {
 			drawWall(v3,v4);
 			drawWall(v4,v1);
 
-			glColor3f(0.5,0.9,1);
+			
 		}
 		else {
 			extrudeVal = 0;
-			glColor3f(1,0,1);
 		}
 
+		glColor3f(0.8,0.8,0.8);
 	
 		glBegin(GL_POLYGON);
 			glNormal3f(vertexNormals->at(v1).x, vertexNormals->at(v1).y, vertexNormals->at(v1).z);
@@ -308,19 +308,15 @@ void terrain::calcVertexNormals() {
 }
 
 void terrain::drawWall(int v1, int v2) {
-	glColor3f(0.5,0.9,0);
+	glColor3f(0.65,0.65,0.65);
 	glBegin(GL_POLYGON);
+		glTexCoord2f(0, 0);
 		glVertex3f(verts->at(v1).x, verts->at(v1).y, verts->at(v1).z);
+		glTexCoord2f(0, 1);
 		glVertex3f(verts->at(v2).x, verts->at(v2).y, verts->at(v2).z);
+		glTexCoord2f(1, 0);
 		glVertex3f(verts->at(v2).x, verts->at(v2).y + height, verts->at(v2).z);
-		glVertex3f(verts->at(v1).x, verts->at(v1).y + height, verts->at(v1).z);
-	glEnd();
-
-	glColor3f(0,0,1);
-	glBegin(GL_LINE_STRIP);
-		glVertex3f(verts->at(v1).x, verts->at(v1).y, verts->at(v1).z);
-		glVertex3f(verts->at(v2).x, verts->at(v2).y, verts->at(v2).z);
-		glVertex3f(verts->at(v2).x, verts->at(v2).y + height, verts->at(v2).z);
+		glTexCoord2f(1, 1);
 		glVertex3f(verts->at(v1).x, verts->at(v1).y + height, verts->at(v1).z);
 	glEnd();
 }

@@ -140,9 +140,9 @@ void CCamera::Render( void )
 	SF3dVector ViewPoint = Position+ViewDir;
 
 	//as we know the up vector, we can easily use gluLookAt:
-	// gluLookAt(	Position.x,Position.y,Position.z,
-	// 			ViewPoint.x,ViewPoint.y,ViewPoint.z,
-	// 			UpVector.x,UpVector.y,UpVector.z);
+	gluLookAt(	Position.x,Position.y,Position.z,
+				ViewPoint.x,ViewPoint.y,ViewPoint.z,
+				UpVector.x,UpVector.y,UpVector.z);
 
 }
 
