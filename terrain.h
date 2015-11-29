@@ -3,6 +3,16 @@
 
 #include <vector>
 
+#ifdef __APPLE__
+#  include <OpenGL/gl.h>
+#  include <OpenGL/glu.h>
+#  include <GLUT/glut.h>
+#else
+#  include <GL/gl.h>
+#  include <GL/glu.h>
+#  include <GL/freeglut.h>
+#endif
+
 using namespace std;
 
 struct vertex3D {
@@ -54,6 +64,7 @@ public:
 	terrain(int sizeX, int sizeZ, int height);
 	void load();
 	void draw();
+	bool checkCollision(float xPos, float zPos);
 
 private:
 	vector<vertex3D>*verts;

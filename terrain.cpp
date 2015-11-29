@@ -29,7 +29,7 @@ terrain::terrain(int sizeX, int sizeZ, int height) {
 
 	// mazeHeightMap is a 2d representation of the maze where each element's value is either 0 (walkable path) 
 	// or height (wall)
-	// NOTE THE ORDER OF sizeX,sizeZ (i.e. (x,z)) in array
+	// NOTE THE ORDER OF sizeX,sizeZ (i.e. (x,z)) in array - positive x-axis points DOWN, positive z-axis points LEFT
 	mazeHeightMap = new int*[sizeX];
 	for (int x = 0; x < sizeX; ++x) {
 		mazeHeightMap[x] = new int[sizeZ];
@@ -55,8 +55,8 @@ void terrain::load() {
 	// Set x, y, z values for all the vertices in such a way that it translates into a flat plane of points
 	// i.e. all points have height 0
 	int vertexCount = 0;
-	for (int x = -sizeX/2; x <= sizeX/2; ++x) {
-		for (int z = sizeZ/2; z >= -sizeZ/2; --z) {
+	for (int x = (-sizeX/2)*10; x <= (sizeX/2)*10; x+=10) {
+		for (int z = (sizeZ/2)*10; z >= (-sizeZ/2)*10; z-=10) {
 			verts->at(vertexCount).set(x,0,z);
 			vertexCount++;
 		}
@@ -157,6 +157,41 @@ void terrain::draw() {
 			heightZ = 0;
 		}
 	}
+}
+
+bool terrain::checkCollision(float xPos, float zPos) {
+	int heightX = 0; 
+	int heightZ = 0;
+
+	for (int i = 0; i < faces->size(); ++i) {
+		if (xPos >= faces->at(i).v3.x && 
+			xPos <= faces->at(i).v1.x && 
+			zPos >= faces->at(i).v3.z && 
+			zPos <= faces->at(i).v1.z) {
+			// printf("FaceXLow:%f FaceXHigh:%f FaceZLow:%f FaceZHigh:%f X:%d Z:%d -- On face:%d\n", 
+			// 	faces->at(i).v3.x, faces->at(i).v1.x, faces->at(i).v3.z, faces->at(i).v1.z, xPos, zPos, i);
+			if (mazeHeightMap[heightX][heightZ] < height) return false;
+		}
+
+		heightZ++;
+		if (heightZ >= sizeZ) {
+			heightX++;
+			heightZ = 0;
+		}
+	// 	// else printf("COLLISSION! FaceXLow:%f FaceXHigh:%f FaceZLow:%f FaceZHigh:%f X:%d Z:%d \n", 
+	// 	// 	faces->at(i).v3.x, faces->at(i).v1.x, faces->at(i).v1.z, faces->at(i).v3.z, xPos, zPos);
+	}
+
+	printf("COLLISSION!\n");
+	return true;
+
+	// for (int i = 0; i < verts->size(); ++i) {
+	// 	printf("(%d,%d) ", int(verts->at(i).x), int(verts->at(i).z));
+	// 	if ((i+1)%11 == 0) printf("\n");
+	// }
+
+	// printf("COLLISSION! FaceXLow:%f FaceXHigh:%f FaceZLow:%f FaceZHigh:%f X:%d Z:%d \n", 
+	// 		faces->at(10).v3.x, faces->at(10).v1.x, faces->at(10).v1.z, faces->at(10).v3.z, xPos, zPos);
 }
 
 // Private function: Populate mazeHeightMap array

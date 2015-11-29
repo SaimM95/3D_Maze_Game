@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include "terrain.h"
+// Source: http://www.codecolony.de/opengl.htm#Camera2
 #include "camera.h"
 
 #ifdef __APPLE__
@@ -39,6 +40,12 @@ float m_diff[] = {0.78, 0.57, 0.11, 1.0};
 float m_spec[] = {0.99, 0.91, 0.81, 1.0};
 float shiny = 5;
 
+bool moveBack = false; 
+bool moveForward = false;
+
+float playerHeight = 2.0;
+int yDirCounter = 0;
+
 void drawAxis() {
 	// Z-axis = Red
 	glColor3f(1,0,0);
@@ -73,8 +80,8 @@ void display(void) {
 				Camera.ViewDir.x + Camera.Position.x,Camera.ViewDir.y + Camera.Position.y,Camera.ViewDir.z + Camera.Position.z,
 				Camera.UpVector.x,Camera.UpVector.y,Camera.UpVector.z);
 
-	Camera.showPosition();
-	Camera.showViewPoint();
+	// Camera.showPosition();
+	// Camera.showViewPoint();
 
 	// gluLookAt(camPos[0], camPos[1], camPos[2], camFocus[0],camFocus[1],camFocus[2], upVect[0],upVect[1],upVect[2]);
 
@@ -107,11 +114,52 @@ void special(int key, int x, int y) {
 
 	switch(key) {
 		case GLUT_KEY_UP:
-			Camera.MoveForward( -0.1 );
-			display();
+			// "Pretend" to move forward
+			Camera.MoveForward( -1 );
+
+			// Restrict movement along the y-axis (i.e can't fly or go through the ground)
+			if (yDirCounter != 0) {
+				printf("PosY:%f PlayerHeight:%f ViewY:%f\n", Camera.Position.y, playerHeight, abs(Camera.ViewDir.y));
+				Camera.MoveForward(1);		// reset pretend move
+				return;
+			}
+
+			// If the "pretend" move doesn't cause a collision, actually move forward
+			// otherwise, reset the "pretend" move
+			if (!mazeTerrain.checkCollision(Camera.Position.x, Camera.Position.z) || moveForward == true) {
+				Camera.MoveForward( 1 );	// reset pretend move
+				Camera.MoveForward( -0.5 );	// actually move
+				moveForward = false;
+				moveBack = false;
+			} 
+			else {
+				Camera.MoveForward( 1 );	// reset pretend move
+				moveBack = true;
+				printf("Move Back\n");
+			}
 			break;
 		case GLUT_KEY_DOWN:
-			Camera.MoveForward( 0.1 ) ;
+			// "Pretend" to move backward
+			Camera.MoveForward( 1 );
+
+			// Restrict movement along the y-axis (i.e can't fly or go through the ground)
+			if (yDirCounter != 0) {
+				printf("PosY:%f PlayerHeight:%f ViewY:%f\n", Camera.Position.y, playerHeight, abs(Camera.ViewDir.y));
+				Camera.MoveForward(1);		// reset pretend move
+				return;
+			}
+
+			if (!mazeTerrain.checkCollision(Camera.Position.x, Camera.Position.z) || moveBack == true) {
+				Camera.MoveForward( -1 );	// reset pretend move
+				Camera.MoveForward( 0.5 );	// actually move
+				moveForward = false;
+				moveBack = false;
+			} 
+			else {
+				Camera.MoveForward( -1 );	// reset pretend move
+				moveForward = true;
+				printf("Move Forward\n");
+			}
 			break;
 		case GLUT_KEY_RIGHT:
 			Camera.RotateY(-5.0);
@@ -133,11 +181,15 @@ void keyboard(unsigned char key, int x, int y) {
 		case 'w':		
 			// Camera.RotateX(5.0);
 			Camera.ViewDir.y += 0.1;
+			yDirCounter++;
+			printf("ViewY:%f\n", Camera.ViewDir.y*1000000);
 			display();
 			break;
 		case 's':		
 			// Camera.RotateX(-5.0);
 			Camera.ViewDir.y -= 0.1;
+			yDirCounter--;
+			printf("ViewY:%f\n", Camera.ViewDir.y*1000000);
 			display();
 			break;
 	}
@@ -196,7 +248,7 @@ int main(int argc, char** argv) {
 
 	mazeTerrain.load();
 
-	Camera.Move( F3dVector(-4.0, 1.0, 11.0 ));
+	Camera.Move( F3dVector(-31.0, playerHeight, 35.0 ));
 	Camera.MoveForward( 1.0 );
 
 	glutDisplayFunc(display);	//registers "display" as the display callback function
