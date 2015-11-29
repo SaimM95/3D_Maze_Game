@@ -49,6 +49,10 @@ bool moveForward = false;
 float playerHeight = 2.0;
 int camYDirCounter = 0;
 
+double start[] = {0,0,0}, endL[] = {1,1,1};
+
+bool sphereAlive = true;
+
 /* TEXTURE */
 GLubyte *img_data;
 int width, height, maximum;
@@ -169,6 +173,93 @@ void drawCrosshair() {
     gluPerspective(40.0,(GLdouble)windowWidth/(GLdouble)windowHeight,0.5,400.0);
 }
 
+bool Intersect(int x, int y){
+	printf("%i, %i\n", x, y);
+
+	//allocate matricies memory
+	double matModelView[16], matProjection[16]; 
+	int viewport[4]; 
+
+	//vectors
+
+
+	//grab the matricies
+	glGetDoublev(GL_MODELVIEW_MATRIX, matModelView); 
+	glGetDoublev(GL_PROJECTION_MATRIX, matProjection); 
+	glGetIntegerv(GL_VIEWPORT, viewport); 
+
+	//unproject the values
+	double winX = (double)x; 
+	double winY = viewport[3] - (double)y; 
+
+	// get point on the 'near' plane (third param is set to 0.0)
+	gluUnProject(winX, winY, 0.0, matModelView, matProjection, 
+         viewport, &start[0], &start[1], &start[2]); 
+
+	// get point on the 'far' plane (third param is set to 1.0)
+	gluUnProject(winX, winY, 1.0, matModelView, matProjection, 
+         viewport, &endL[0], &endL[1], &endL[2]); 
+
+
+	printf("near point: %f,%f,%f\n", start[0], start[1], start[2]);
+	printf("far point: %f,%f,%f\n", endL[0], endL[1], endL[2]);
+
+	//check for intersection against sphere!
+	//hurray!
+
+	double A, B, C;
+
+	double R0x, R0y, R0z;
+	double Rdx, Rdy, Rdz;
+
+	R0x = start[0];
+	R0y = start[1];
+	R0z = start[2];
+
+	Rdx = endL[0] - start[0];
+	Rdy = endL[1] - start[1];
+	Rdz = endL[2] - start[2];
+
+	//magnitude!
+	double M = sqrt(Rdx*Rdx + Rdy*Rdy + Rdz* Rdz);
+
+	//unit vector!
+	Rdx /= M;
+	Rdy /= M;
+	Rdz /= M;
+
+	//A = Rd dot Rd
+	A = Rdx*Rdx + Rdy*Rdy + Rdz*Rdz;
+
+	double Btempx, Btempy, Btempz;
+	Btempx = R0x;
+	Btempy =  R0y;
+	Btempz =  R0z;
+
+	B = (Btempx-15) * Rdx + (Btempy-2) * Rdy + (Btempz-11) *Rdz;
+	B *= 2.0;
+
+	C = (R0x-15)*(R0x-15) + (R0y-2)*(R0y-2) + (R0z-11)*(R0z-11) - 1;
+
+
+	double sq = B*B  - 4*A*C;
+
+	double t0 = 0, t1 = 0;
+
+	if(sq < 0)
+		printf("no Intersection!!!\n");
+	else{
+		t0 = ((-1) * B + sqrt(sq))/(2*A);
+		t1 = ((-1) * B - sqrt(sq))/(2*A);
+
+		printf("Intersection at: t = %f, and t = %f\n", t0, t1);
+		return true;
+	}
+
+
+	return false; //else returns false
+}
+
 void display(void) {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glMatrixMode(GL_MODELVIEW);
@@ -222,6 +313,20 @@ void display(void) {
 	mazeTerrain.draw();
 
 	drawCrosshair();
+	
+	glBegin(GL_LINES);
+		glColor3f(1,0,0);
+		glVertex3f(start[0], start[1], start[2]);
+		glVertex3f(endL[0], endL[1], endL[2]);
+	glEnd();
+
+	if (sphereAlive) {
+		glPushMatrix();
+		glTranslatef(18,2,11);
+		glColor3f(1,0,0);
+		glutSolidSphere(1,20,20);
+		glPopMatrix();
+	}
 
 	glFlush();
 	glutSwapBuffers();
@@ -242,7 +347,6 @@ void special(int key, int x, int y) {
 
 			// Restrict movement along the y-axis (i.e can't fly or go through the ground)
 			if (camYDirCounter != 0) {
-				printf("PosY:%f PlayerHeight:%f ViewY:%f\n", Camera.Position.y, playerHeight, abs(Camera.ViewDir.y));
 				Camera.MoveForward(1);		// reset pretend move
 				return;
 			}
@@ -267,7 +371,6 @@ void special(int key, int x, int y) {
 
 			// Restrict movement along the y-axis (i.e can't fly or go through the ground)
 			if (camYDirCounter != 0) {
-				printf("PosY:%f PlayerHeight:%f ViewY:%f\n", Camera.Position.y, playerHeight, abs(Camera.ViewDir.y));
 				Camera.MoveForward(1);		// reset pretend move
 				return;
 			}
@@ -285,10 +388,10 @@ void special(int key, int x, int y) {
 			}
 			break;
 		case GLUT_KEY_RIGHT:
-			Camera.RotateY(-5.0);
+			Camera.RotateY(-3.0);
 			break;
 		case GLUT_KEY_LEFT:
-			Camera.RotateY(5.0);
+			Camera.RotateY(3.0);
 			break;
 	}
 
@@ -315,6 +418,32 @@ void keyboard(unsigned char key, int x, int y) {
 			printf("ViewY:%f\n", Camera.ViewDir.y*1000000);
 			display();
 			break;
+		case 'd':
+			Camera.RotateY(-1.0);
+			display();
+			break;
+		case 'a':
+			Camera.RotateY(1.0);
+			display();
+			break;
+		case ' ':
+			// Intersect(int(Camera.ViewDir.x), int(Camera.ViewDir.z));
+			if (Intersect(x,y)) {
+				sphereAlive = false;
+				printf("Sphere is dead\n");
+				display();
+			}
+			break;
+	}
+}
+
+void mouse(int button, int state, int x, int y){
+	if(button ==  GLUT_LEFT_BUTTON && state == GLUT_DOWN){
+		if (Intersect(x,y)) {
+			sphereAlive = false;
+			printf("Sphere is dead\n");
+			display();
+		}
 	}
 }
 
@@ -376,6 +505,7 @@ int main(int argc, char** argv) {
 	glutReshapeFunc(reshape);
 	glutKeyboardFunc(keyboard);
 	glutSpecialFunc(special);
+	glutMouseFunc(mouse);
 
     /* TEXTURES */
 	glEnable(GL_TEXTURE_2D);
