@@ -27,7 +27,7 @@ terrain::terrain(int sizeX, int sizeZ, int height) {
 	faceNormals = new vector<vertex3D>(faces->size());
 	vertexNormals = new vector<vertex3D>(verts->size());
 
-	// mazeHeightMap is a 2d representation of the maze where each element's value is either 0 (walkable path) 
+	// mazeHeightMap is a 2d representation of the maze where each element's value is either 0 (walkable path)
 	// or height (wall)
 	// NOTE THE ORDER OF sizeX,sizeZ (i.e. (x,z)) in array - positive x-axis points DOWN, positive z-axis points LEFT
 	mazeHeightMap = new int*[sizeX];
@@ -68,10 +68,10 @@ void terrain::load() {
 	// 	}
 	// }
 
-	// Fill the faces vector with vertices in a sequential manner 
+	// Fill the faces vector with vertices in a sequential manner
 	// (i.e. each 4 vertices that should appear together, correspond to a single polygon)
 	int xCount = 0;
-	int heightX = 0; 
+	int heightX = 0;
 	int heightZ = 0;
 	for (int f = 0; f < faces->size(); ++f) {
 		if (f > 0 && f%sizeX == 0) xCount++;
@@ -108,7 +108,7 @@ void terrain::load() {
 // Draw the terrain using glut functions
 void terrain::draw() {
 	int xCount = 0;
-	int heightX = 0; 
+	int heightX = 0;
 	int heightZ = 0;
 
 	int extrudeVal = 0;
@@ -129,14 +129,14 @@ void terrain::draw() {
 			drawWall(v3,v4);
 			drawWall(v4,v1);
 
-			
+
 		}
 		else {
 			extrudeVal = 0;
 		}
 
 		glColor3f(0.8,0.8,0.8);
-	
+
 		glBegin(GL_POLYGON);
 			glNormal3f(vertexNormals->at(v1).x, vertexNormals->at(v1).y, vertexNormals->at(v1).z);
 			glVertex3f(faces->at(i).v1.x, faces->at(i).v1.y + extrudeVal, faces->at(i).v1.z);
@@ -160,15 +160,15 @@ void terrain::draw() {
 }
 
 bool terrain::checkCollision(float xPos, float zPos) {
-	int heightX = 0; 
+	int heightX = 0;
 	int heightZ = 0;
 
 	for (int i = 0; i < faces->size(); ++i) {
-		if (xPos >= faces->at(i).v3.x && 
-			xPos <= faces->at(i).v1.x && 
-			zPos >= faces->at(i).v3.z && 
+		if (xPos >= faces->at(i).v3.x &&
+			xPos <= faces->at(i).v1.x &&
+			zPos >= faces->at(i).v3.z &&
 			zPos <= faces->at(i).v1.z) {
-			// printf("FaceXLow:%f FaceXHigh:%f FaceZLow:%f FaceZHigh:%f X:%d Z:%d -- On face:%d\n", 
+			// printf("FaceXLow:%f FaceXHigh:%f FaceZLow:%f FaceZHigh:%f X:%d Z:%d -- On face:%d\n",
 			// 	faces->at(i).v3.x, faces->at(i).v1.x, faces->at(i).v3.z, faces->at(i).v1.z, xPos, zPos, i);
 			if (mazeHeightMap[heightX][heightZ] < height) return false;
 		}
@@ -178,7 +178,7 @@ bool terrain::checkCollision(float xPos, float zPos) {
 			heightX++;
 			heightZ = 0;
 		}
-	// 	// else printf("COLLISSION! FaceXLow:%f FaceXHigh:%f FaceZLow:%f FaceZHigh:%f X:%d Z:%d \n", 
+	// 	// else printf("COLLISSION! FaceXLow:%f FaceXHigh:%f FaceZLow:%f FaceZHigh:%f X:%d Z:%d \n",
 	// 	// 	faces->at(i).v3.x, faces->at(i).v1.x, faces->at(i).v1.z, faces->at(i).v3.z, xPos, zPos);
 	}
 
@@ -190,19 +190,19 @@ bool terrain::checkCollision(float xPos, float zPos) {
 	// 	if ((i+1)%11 == 0) printf("\n");
 	// }
 
-	// printf("COLLISSION! FaceXLow:%f FaceXHigh:%f FaceZLow:%f FaceZHigh:%f X:%d Z:%d \n", 
+	// printf("COLLISSION! FaceXLow:%f FaceXHigh:%f FaceZLow:%f FaceZHigh:%f X:%d Z:%d \n",
 	// 		faces->at(10).v3.x, faces->at(10).v1.x, faces->at(10).v1.z, faces->at(10).v3.z, xPos, zPos);
 }
 
 // Private function: Populate mazeHeightMap array
-void terrain::generateMaze() {
-	// Put walls on all the edges of the terrain
-	for (int x = 0; x < sizeX; ++x) {
-		for (int z = 0; z < sizeZ; ++z) {
-			if (x == 0 || z == 0 || x == sizeX-1 || z == sizeZ-1)
-				mazeHeightMap[x][z] = height;
-		}
-	}
+/* void generateMaze2() { */
+	/* // Put walls on all the edges of the terrain */
+	/* for (int x = 0; x < sizeX; ++x) { */
+	/* 	for (int z = 0; z < sizeZ; ++z) { */
+	/* 		if (x == 0 || z == 0 || x == sizeX-1 || z == sizeZ-1) */
+	/* 			mazeHeightMap[x][z] = height; */
+	/* 	} */
+	/* } */
 
 	// mazeHeightMap[10][10] = {
 	// 				{5,5,5,5,5,5,5,5,5,5},
@@ -217,34 +217,37 @@ void terrain::generateMaze() {
 	// 				{5,5,5,5,5,5,5,5,5,5}
 	// 			};
 
-	// Generate maze walls
-	// ...
-	mazeHeightMap[1][0] = 0;
-	mazeHeightMap[1][2] = 5;
-	mazeHeightMap[2][2] = 5;
-	mazeHeightMap[3][2] = 5;
-	mazeHeightMap[4][2] = 5;
-	mazeHeightMap[5][2] = 5;
-	mazeHeightMap[7][2] = 5;
-	mazeHeightMap[8][2] = 5;
-	mazeHeightMap[1][4] = 5;
-	mazeHeightMap[2][4] = 5;
-	mazeHeightMap[3][4] = 5;
-	mazeHeightMap[4][4] = 5;
-	mazeHeightMap[5][4] = 5;
-	mazeHeightMap[6][4] = 5;
-	mazeHeightMap[7][4] = 5;
-	mazeHeightMap[2][6] = 5;
-	mazeHeightMap[3][6] = 5;
-	mazeHeightMap[5][6] = 5;
-	mazeHeightMap[6][6] = 5;
-	mazeHeightMap[7][6] = 5;
-	mazeHeightMap[8][6] = 5;
-	mazeHeightMap[5][7] = 5;
-	mazeHeightMap[2][8] = 5;
-	mazeHeightMap[3][8] = 5;
-	mazeHeightMap[7][8] = 5;
-	mazeHeightMap[8][9] = 0;
+	/* // Generate maze walls */
+	/* // ... */
+	/* mazeHeightMap[1][0] = 0; */
+	/* mazeHeightMap[1][2] = 5; */
+	/* mazeHeightMap[2][2] = 5; */
+	/* mazeHeightMap[3][2] = 5; */
+	/* mazeHeightMap[4][2] = 5; */
+	/* mazeHeightMap[5][2] = 5; */
+	/* mazeHeightMap[7][2] = 5; */
+	/* mazeHeightMap[8][2] = 5; */
+	/* mazeHeightMap[1][4] = 5; */
+	/* mazeHeightMap[2][4] = 5; */
+	/* mazeHeightMap[3][4] = 5; */
+	/* mazeHeightMap[4][4] = 5; */
+	/* mazeHeightMap[5][4] = 5; */
+	/* mazeHeightMap[6][4] = 5; */
+	/* mazeHeightMap[7][4] = 5; */
+	/* mazeHeightMap[2][6] = 5; */
+	/* mazeHeightMap[3][6] = 5; */
+	/* mazeHeightMap[5][6] = 5; */
+	/* mazeHeightMap[6][6] = 5; */
+	/* mazeHeightMap[7][6] = 5; */
+	/* mazeHeightMap[8][6] = 5; */
+	/* mazeHeightMap[5][7] = 5; */
+	/* mazeHeightMap[2][8] = 5; */
+	/* mazeHeightMap[3][8] = 5; */
+	/* mazeHeightMap[7][8] = 5; */
+	/* mazeHeightMap[8][9] = 0; */
+/* } */
+void terrain::generateMaze(){
+
 }
 
 // Private function: Print out the mazeHeightMap array
@@ -261,10 +264,10 @@ void terrain::showMaze() {
 void terrain::calcFaceNormals() {
 	float normalLength;
 	for (int i = 0; i < faceNormals->size(); ++i) {
-		float v1[] = {faces->at(i).v2.x - faces->at(i).v1.x, faces->at(i).v2.y - faces->at(i).v1.y, 
+		float v1[] = {faces->at(i).v2.x - faces->at(i).v1.x, faces->at(i).v2.y - faces->at(i).v1.y,
 					faces->at(i).v2.z - faces->at(i).v1.z};
 
-		float v2[] = {faces->at(i).v4.x - faces->at(i).v1.x, faces->at(i).v4.y - faces->at(i).v1.y, 
+		float v2[] = {faces->at(i).v4.x - faces->at(i).v1.x, faces->at(i).v4.y - faces->at(i).v1.y,
 			faces->at(i).v4.z - faces->at(i).v1.z};
 
 		// Cross Product
@@ -298,7 +301,7 @@ void terrain::calcVertexNormals() {
 				aveZ += faceNormals->at(verts->at(i).faces[0]).z;
 			}
 		}
-		
+
 		aveX /= verts->at(i).numFaces;
 		aveY /= verts->at(i).numFaces;
 		aveZ /= verts->at(i).numFaces;
