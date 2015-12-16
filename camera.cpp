@@ -7,6 +7,27 @@
 
 #define NULL_VECTOR F3dVector(0.0f,0.0f,0.0f)
 
+#include <stdio.h>
+#include <stdlib.h>
+
+#ifdef __APPLE__
+#  include <OpenGL/gl.h>
+#  include <OpenGL/glu.h>
+#  include <GLUT/glut.h>
+#else
+#  include <GL/gl.h>
+#  include <GL/glu.h>
+#  include <GL/freeglut.h>
+#endif
+#include <iostream>
+#include <math.h>
+#include "terrain.h"
+
+
+
+
+
+
 SF3dVector F3dVector ( GLfloat x, GLfloat y, GLfloat z )
 {
 	SF3dVector tmp;
@@ -98,7 +119,7 @@ void CCamera::Move (SF3dVector Direction)
 void CCamera::RotateX (GLfloat Angle)
 {
 	RotatedX += Angle;
-	
+
 	//Rotate viewdir around the right vector:
 	ViewDir = Normalize3dVector(ViewDir*cos(Angle*PIdiv180)
 								+ UpVector*sin(Angle*PIdiv180));
@@ -106,13 +127,13 @@ void CCamera::RotateX (GLfloat Angle)
 	//now compute the new UpVector (by cross product)
 	UpVector = CrossProduct(&ViewDir, &RightVector)*-1;
 
-	
+
 }
 
 void CCamera::RotateY (GLfloat Angle)
 {
 	RotatedY += Angle;
-	
+
 	//Rotate viewdir around the up vector:
 	ViewDir = Normalize3dVector(ViewDir*cos(Angle*PIdiv180)
 								- RightVector*sin(Angle*PIdiv180));
@@ -124,7 +145,7 @@ void CCamera::RotateY (GLfloat Angle)
 void CCamera::RotateZ (GLfloat Angle)
 {
 	RotatedZ += Angle;
-	
+
 	//Rotate viewdir around the right vector:
 	RightVector = Normalize3dVector(RightVector*cos(Angle*PIdiv180)
 								+ UpVector*sin(Angle*PIdiv180));

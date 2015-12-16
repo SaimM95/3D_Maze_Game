@@ -15,6 +15,14 @@
 #  include <GL/freeglut.h>
 #endif
 
+#include <GL/glut.h>
+#include <stdlib.h>
+#include <GL/glut.h>
+#include <GL/gl.h>
+#include <GL/glu.h>
+#include <GL/glext.h>
+#include <math.h>
+
 using namespace std;
 
 #define ShowUpvector
@@ -33,17 +41,17 @@ float camPos[] = {50,0,50};
 float camFocus[] = {0,0,0};
 
 float light_pos[] = {0, 100, 0,1};
- 
+
 float amb1[] = {1, 0, 1, 1};
 float diff1[] = {1, 0, 0, 1};
 float spec1[] = {1, 1, 0, 1};
- 
+
 float m_amb[] = {0.22, 0.11, 0.03, 1.0};
 float m_diff[] = {0.78, 0.57, 0.11, 1.0};
 float m_spec[] = {0.99, 0.91, 0.81, 1.0};
 float shiny = 5;
 
-bool moveBack = false; 
+bool moveBack = false;
 bool moveForward = false;
 
 float playerHeight = 2.0;
@@ -68,26 +76,26 @@ GLubyte* LoadPPM(char* file, int* width, int* height, int* max)
 	char b[100];
 	float s;
 	int red, green, blue;
-	
+
 	/* first open file and check if it's an ASCII PPM (indicated by P3 at the start) */
 	fd = fopen(file, "r");
 	fscanf(fd,"%[^\n] ",b);
 	if(b[0]!='P'|| b[1] != '3')
 	{
-		printf("%s is not a PPM file!\n",file); 
+		printf("%s is not a PPM file!\n",file);
 		exit(0);
 	}
 	printf("%s is a PPM file\n", file);
 	fscanf(fd, "%c",&c);
 
 	/* next, skip past the comments - any line starting with #*/
-	while(c == '#') 
+	while(c == '#')
 	{
 		fscanf(fd, "%[^\n] ", b);
 		printf("%s\n",b);
 		fscanf(fd, "%c",&c);
 	}
-	ungetc(c,fd); 
+	ungetc(c,fd);
 
 	/* now get the dimensions and max colour value from the image */
 	fscanf(fd, "%d %d %d", &n, &m, &k);
@@ -100,7 +108,7 @@ GLubyte* LoadPPM(char* file, int* width, int* height, int* max)
 	s=255.0/k;
 
 	/* for every pixel, grab the read green and blue values, storing them in the image data array */
-	for(i=0;i<nm;i++) 
+	for(i=0;i<nm;i++)
 	{
 		fscanf(fd,"%d %d %d",&red, &green, &blue );
 		img[3*nm-3*i-3]=red*s;
@@ -165,7 +173,7 @@ void drawCrosshair() {
     glPopMatrix();
 
     //Set a new projection matrix
-    glMatrixMode(GL_PROJECTION);  
+    glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     //Angle of view:40 degrees
     //Near clipping plane distance: 0.5
@@ -177,28 +185,28 @@ bool Intersect(int x, int y){
 	printf("%i, %i\n", x, y);
 
 	//allocate matricies memory
-	double matModelView[16], matProjection[16]; 
-	int viewport[4]; 
+	double matModelView[16], matProjection[16];
+	int viewport[4];
 
 	//vectors
 
 
 	//grab the matricies
-	glGetDoublev(GL_MODELVIEW_MATRIX, matModelView); 
-	glGetDoublev(GL_PROJECTION_MATRIX, matProjection); 
-	glGetIntegerv(GL_VIEWPORT, viewport); 
+	glGetDoublev(GL_MODELVIEW_MATRIX, matModelView);
+	glGetDoublev(GL_PROJECTION_MATRIX, matProjection);
+	glGetIntegerv(GL_VIEWPORT, viewport);
 
 	//unproject the values
-	double winX = (double)x; 
-	double winY = viewport[3] - (double)y; 
+	double winX = (double)x;
+	double winY = viewport[3] - (double)y;
 
 	// get point on the 'near' plane (third param is set to 0.0)
-	gluUnProject(winX, winY, 0.0, matModelView, matProjection, 
-         viewport, &start[0], &start[1], &start[2]); 
+	gluUnProject(winX, winY, 0.0, matModelView, matProjection,
+         viewport, &start[0], &start[1], &start[2]);
 
 	// get point on the 'far' plane (third param is set to 1.0)
-	gluUnProject(winX, winY, 1.0, matModelView, matProjection, 
-         viewport, &endL[0], &endL[1], &endL[2]); 
+	gluUnProject(winX, winY, 1.0, matModelView, matProjection,
+         viewport, &endL[0], &endL[1], &endL[2]);
 
 
 	printf("near point: %f,%f,%f\n", start[0], start[1], start[2]);
@@ -291,29 +299,29 @@ void display(void) {
 	drawAxis();
 
 	// glPushMatrix();
-	
+
 	//do the rotation - rotate about the Y axis by angle ang
 	// glRotatef(ang, 0, 1, 0);
-	
+
 	//draw the teapot
-	
+
 	/* MATERIALS */
-	
-	
+
+
 	glColor3f(1,0,0);
-	
+
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); 
-	
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
 	//pop the matrix back to what it was prior to the rotation
 	// glPopMatrix();
 
 	mazeTerrain.draw();
 
 	drawCrosshair();
-	
+
 	glBegin(GL_LINES);
 		glColor3f(1,0,0);
 		glVertex3f(start[0], start[1], start[2]);
@@ -358,7 +366,7 @@ void special(int key, int x, int y) {
 				Camera.MoveForward( -0.5 );	// actually move
 				moveForward = false;
 				moveBack = false;
-			} 
+			}
 			else {
 				Camera.MoveForward( 1 );	// reset pretend move
 				moveBack = true;
@@ -380,7 +388,7 @@ void special(int key, int x, int y) {
 				Camera.MoveForward( 0.5 );	// actually move
 				moveForward = false;
 				moveBack = false;
-			} 
+			}
 			else {
 				Camera.MoveForward( -1 );	// reset pretend move
 				moveForward = true;
@@ -404,14 +412,14 @@ void keyboard(unsigned char key, int x, int y) {
 		case 'q':
 			exit(0);
 			break;
-		case 'w':		
+		case 'w':
 			// Camera.RotateX(5.0);
 			Camera.ViewDir.y += 0.1;
 			camYDirCounter++;
 			printf("ViewY:%f\n", Camera.ViewDir.y*1000000);
 			display();
 			break;
-		case 's':		
+		case 's':
 			// Camera.RotateX(-5.0);
 			Camera.ViewDir.y -= 0.1;
 			camYDirCounter--;
@@ -470,9 +478,9 @@ void init(void) {
 
 void reshape(int x, int y) {
 	if (y == 0 || x == 0) return;  //Nothing is visible then, so return
-	
+
 	//Set a new projection matrix
-	glMatrixMode(GL_PROJECTION);  
+	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	//Angle of view:40 degrees
 	//Near clipping plane distance: 0.5
@@ -485,16 +493,16 @@ void reshape(int x, int y) {
 
 int main(int argc, char** argv) {
 	glutInit(&argc, argv);		//starts up GLUT
-	
+
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
-	
+
 	glutInitWindowSize(600, 600);
 	glutInitWindowPosition(0, 0);
 
 	glutCreateWindow("3D Maze Game");	//creates the window
 
 	// initialize random seed
-	srand(time(NULL));
+	srand((0));
 
 	mazeTerrain.load();
 
@@ -513,7 +521,7 @@ int main(int argc, char** argv) {
 	img_data = LoadPPM("marble.ppm", &width, &height, &maximum);
 
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
-				GL_UNSIGNED_BYTE, img_data); 
+				GL_UNSIGNED_BYTE, img_data);
 
     // image = LoadPPM("interface.ppm", &width, &height, &max);
 
