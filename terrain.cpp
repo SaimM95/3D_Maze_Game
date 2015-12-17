@@ -250,7 +250,7 @@ void terrain::generateMaze(){
   // make everything equal to 0
   for (int x = 0; x < sizeX; ++x) {
     for (int z = 0; z < sizeZ; ++z) {
-      mazeHeightMap[x][z] = 0;
+      mazeHeightMap[x][z] = -1;
     }
   }
 
@@ -276,8 +276,20 @@ void terrain::generateMaze(){
   }
   mazeHeightMap[startX][startZ] = 0;
   startDFS(startX, startZ);
+
+
+  for (int i = 0; i < sizeX; i++) {
+    for (int j = 0; j < sizeZ; j++)
+      if(mazeHeightMap[i][j]==-1) mazeHeightMap[i][j] = 0;
+  }
 }
 void terrain::startDFS(int x, int z){
+  // find all possible places to go
+    // if 0 end the function
+
+  // make a loop that goes through all of em
+
+  //end of function
 }
 
 // Private function: Print out the mazeHeightMap array
