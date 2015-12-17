@@ -502,6 +502,12 @@ int main(int argc, char** argv) {
 	// initialize random seed
 	srand((0));
 
+    /* time_t seconds; */
+    /* time(&seconds); */
+    /* srand((unsigned int) seconds); */
+    srand(time(NULL));
+
+
 	mazeTerrain.load();
 
 	Camera.Move( F3dVector(-31.0, playerHeight, 35.0 ));

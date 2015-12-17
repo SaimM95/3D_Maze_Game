@@ -93,11 +93,13 @@ private:
 	vector<faces3D>*faces;
 	vector<vertex3D>*faceNormals;
 	vector<vertex3D>*vertexNormals;
+
 	void generateMaze();
 	void showMaze();
 	void calcFaceNormals();
 	void calcVertexNormals();
 	void drawWall(int v1, int v2);
-};
+    void startDFS(int x, int z);;
 
+};
 #endif

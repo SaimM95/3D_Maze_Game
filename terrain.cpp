@@ -204,18 +204,18 @@ bool terrain::checkCollision(float xPos, float zPos) {
 	/* 	} */
 	/* } */
 
-	// mazeHeightMap[10][10] = {
-	// 				{5,5,5,5,5,5,5,5,5,5},
-	// 			s->	{0,0,5,0,5,0,0,0,0,5},
-	// 				{5,0,5,0,5,0,5,0,5,5},
-	// 				{5,0,5,0,5,0,5,0,5,5},
-	// 				{5,0,5,0,5,0,0,0,0,5},
-	// 				{5,0,5,0,5,0,5,5,0,5},
-	// 				{5,0,0,0,5,0,5,0,0,5},
-	// 				{5,0,5,0,5,0,5,0,5,5},
-	// 				{5,0,5,0,0,0,5,0,0,0}, <- f
-	// 				{5,5,5,5,5,5,5,5,5,5}
-	// 			};
+	/* // mazeHeightMap[10][10] = { */
+	/* // 				{5,5,5,5,5,5,5,5,5,5}, */
+	/* // 			s->	{0,0,5,0,5,0,0,0,0,5}, */
+	/* // 				{5,0,5,0,5,0,5,0,5,5}, */
+	/* // 				{5,0,5,0,5,0,5,0,5,5}, */
+	/* // 				{5,0,5,0,5,0,0,0,0,5}, */
+	/* // 				{5,0,5,0,5,0,5,5,0,5}, */
+	/* // 				{5,0,0,0,5,0,5,0,0,5}, */
+	/* // 				{5,0,5,0,5,0,5,0,5,5}, */
+	/* // 				{5,0,5,0,0,0,5,0,0,0}, <- f */
+	/* // 				{5,5,5,5,5,5,5,5,5,5} */
+	/* // 			}; */
 
 	/* // Generate maze walls */
 	/* // ... */
@@ -247,7 +247,37 @@ bool terrain::checkCollision(float xPos, float zPos) {
 	/* mazeHeightMap[8][9] = 0; */
 /* } */
 void terrain::generateMaze(){
+  // make everything equal to 0
+  for (int x = 0; x < sizeX; ++x) {
+    for (int z = 0; z < sizeZ; ++z) {
+      mazeHeightMap[x][z] = 0;
+    }
+  }
 
+  // make all the boundries along the x aixs
+  for(int i = 0; i < sizeX; i++){
+    mazeHeightMap[i][0] = 5;
+    mazeHeightMap[i][sizeZ-1] = 5;
+  }
+  // make all the boundries along the y axis
+  for(int i = 0; i < sizeZ; i++){
+    mazeHeightMap[0][i] = 5;
+    mazeHeightMap[sizeX-1][i] = 5;
+  }
+
+  //start adding walls
+  int startX, startZ;
+  if(rand()%2 > 0){
+    startX = rand()%(sizeX-2)+1;
+    startZ = (rand()%2 > 0)? 0:sizeZ-1;
+  }else{
+    startX = (rand()%2 > 0)? 0:sizeX-1;
+    startZ = rand()%(sizeZ-2)+1;
+  }
+  mazeHeightMap[startX][startZ] = 0;
+  startDFS(startX, startZ);
+}
+void terrain::startDFS(int x, int z){
 }
 
 // Private function: Print out the mazeHeightMap array
