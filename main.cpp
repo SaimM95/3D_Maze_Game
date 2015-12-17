@@ -505,7 +505,8 @@ int main(int argc, char** argv) {
     /* time_t seconds; */
     /* time(&seconds); */
     /* srand((unsigned int) seconds); */
-    srand(time(NULL));
+    /* srand(time(NULL)); */
+    srand(0);
 
 
 	mazeTerrain.load();
