@@ -10,17 +10,15 @@
 #  include <OpenGL/glu.h>
 #  include <GLUT/glut.h>
 #else
+#  include <GL/glut.h>
+#  include <stdlib.h>
+#  include <GL/glut.h>
 #  include <GL/gl.h>
 #  include <GL/glu.h>
+#  include <GL/glext.h>
 #  include <GL/freeglut.h>
 #endif
 
-#include <GL/glut.h>
-#include <stdlib.h>
-#include <GL/glut.h>
-#include <GL/gl.h>
-#include <GL/glu.h>
-#include <GL/glext.h>
 #include <math.h>
 
 using namespace std;
