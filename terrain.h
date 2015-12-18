@@ -1,39 +1,22 @@
 #ifndef _TERRAIN_H_
 #define _TERRAIN_H_
 
-#include <vector>
-
-#ifdef __APPLE__
-#  include <OpenGL/gl.h>
-#  include <OpenGL/glu.h>
-#  include <GLUT/glut.h>
-#else
-#  include <GL/gl.h>
-#  include <GL/glu.h>
-#  include <GL/freeglut.h>
-#endif
-
-
 #include <stdio.h>
 #include <stdlib.h>
-
-#ifdef __APPLE__
-#  include <OpenGL/gl.h>
-#  include <OpenGL/glu.h>
-#  include <GLUT/glut.h>
-#else
-#  include <GL/gl.h>
-#  include <GL/glu.h>
-#  include <GL/freeglut.h>
-#endif
+#include <vector>
 #include <iostream>
 #include <math.h>
 #include "terrain.h"
 
-
-
-
-
+#ifdef __APPLE__
+#  include <OpenGL/gl.h>
+#  include <OpenGL/glu.h>
+#  include <GLUT/glut.h>
+#else
+#  include <GL/gl.h>
+#  include <GL/glu.h>
+#  include <GL/freeglut.h>
+#endif
 
 using namespace std;
 

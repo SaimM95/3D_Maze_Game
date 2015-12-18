@@ -1,14 +1,9 @@
-#include "camera.h"
-#include <math.h>
-#include <iostream>
-// #include "windows.h"
-
-#define SQR(x) (x*x)
-
-#define NULL_VECTOR F3dVector(0.0f,0.0f,0.0f)
-
 #include <stdio.h>
 #include <stdlib.h>
+#include <iostream>
+#include <math.h>
+#include "terrain.h"
+#include "camera.h"
 
 #ifdef __APPLE__
 #  include <OpenGL/gl.h>
@@ -19,14 +14,9 @@
 #  include <GL/glu.h>
 #  include <GL/freeglut.h>
 #endif
-#include <iostream>
-#include <math.h>
-#include "terrain.h"
 
-
-
-
-
+#define SQR(x) (x*x)
+#define NULL_VECTOR F3dVector(0.0f,0.0f,0.0f)
 
 SF3dVector F3dVector ( GLfloat x, GLfloat y, GLfloat z )
 {

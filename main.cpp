@@ -2,8 +2,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include "terrain.h"
-// Source: http://www.codecolony.de/opengl.htm#Camera2
-#include "camera.h"
+#include "camera.h"		// Source: http://www.codecolony.de/opengl.htm#Camera2
 
 #ifdef __APPLE__
 #  include <OpenGL/gl.h>
@@ -18,8 +17,6 @@
 #  include <GL/glext.h>
 #  include <GL/freeglut.h>
 #endif
-
-#include <math.h>
 
 using namespace std;
 
