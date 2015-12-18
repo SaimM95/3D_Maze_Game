@@ -57,8 +57,7 @@ bool sphereAlive = true;
 GLubyte *img_data;
 int width, height, maximum;
 
-GLubyte* LoadPPM(char* file, int* width, int* height, int* max)
-{
+GLubyte* LoadPPM(char* file, int* width, int* height, int* max) {
 	GLubyte* img;
 	FILE *fd;
 	int n, m;
