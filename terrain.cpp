@@ -44,7 +44,7 @@ terrain::terrain(int sizeX, int sizeZ, int height) {
 
 // Load the maze terrain
 void terrain::load() {
-	generateMaze();
+	generateMaze(sizeX/2, sizeZ/2);
 	showMaze();
 
 	// Use maze2d.mazeHeightMap[][] for height (y-coords) of each vertex
@@ -194,25 +194,6 @@ bool terrain::checkCollision(float xPos, float zPos) {
 	// 		faces->at(10).v3.x, faces->at(10).v1.x, faces->at(10).v1.z, faces->at(10).v3.z, xPos, zPos);
 }
 
-void test(int startX, int startZ, int sizeX, int sizeZ){
-  if(startX == 0 || startX == sizeX-1)      printf("1. input:(%i,%i)  output:(%i,%i)\n", startX, startZ, startX+1-(2*startX)/(sizeX-1), startZ);
-  else if(startZ == 0 || startZ == sizeZ-1) printf("2. input:(%i,%i)  output:(%i,%i)\n", startX, startZ, startX, startZ+1-(2*startZ)/(sizeZ-1));
-}
-
-void randomTest(){
-  //get all the boundaries values
-  for(int x = 1; x < 10-1; x++){
-    test(x, 0, 10, 10);
-    test(x, 9, 10, 10);
-  }
-
-  //get all the boundaries values
-  for(int z = 1; z < 10-1; z++){
-    test(0, z, 10, 10);
-    test(9, z, 10, 10);
-  }
-}
-
 // Private function: Populate mazeHeightMap array
 /* void generateMaze2() { */
 	/* // Put walls on all the edges of the terrain */
@@ -265,13 +246,22 @@ void randomTest(){
 	/* mazeHeightMap[7][8] = 5; */
 	/* mazeHeightMap[8][9] = 0; */
 /* } */
-void terrain::generateMaze(){
-  // make everything equal to 0
+void terrain::generateMaze(int halfWidth, int halfLength){
+  sizeX = halfWidth+1;
+  sizeZ = halfLength+1;
+  for(int i =0; i < sizeX; i++) delete mazeHeightMap[i];
+  delete mazeHeightMap;
+
+  mazeHeightMap = new int*[sizeX]; // create the grid
+  // make everything equal to -1
   for (int x = 0; x < sizeX; ++x) {
+    mazeHeightMap[x] = new int[sizeZ]; // create the width
     for (int z = 0; z < sizeZ; ++z) {
       mazeHeightMap[x][z] = -1;
     }
   }
+
+  //base as in the lowest value that has passed recursion
   int base = 11;
   // make all the boundries along the x aixs
   for(int i = 0; i < sizeX; i++){
@@ -297,12 +287,10 @@ void terrain::generateMaze(){
   mazeHeightMap[startX][startZ] = 11;
   showMaze();
 
-  //test this function
-  /* randomTest(); */
+  // starting the DFS
+  startDFS(startX, startZ);
 
-  if(startX == 0 || startX == sizeX-1) startDFS(startX+1-(2*startX)/(sizeX-1), startZ);
-  if(startZ == 0 || startZ == sizeZ-1) startDFS(startX, startZ+1-(2*startZ)/(sizeZ-1));
-
+  // make all the numbers normal, from 0 or 5
   for (int i = 0; i < sizeX; i++) {
     for (int j = 0; j < sizeZ; j++){
       if(mazeHeightMap[i][j]==-1) mazeHeightMap[i][j] = 0;
@@ -312,17 +300,20 @@ void terrain::generateMaze(){
 
   printf("done the start making terrain function\n");
 }
+
 void terrain::startDFS(int x, int z){
-  printf("starting the DFS with the values of x:%i, z:%i going to print the maze\n",x,z);
+  printf("\n\nstarting the DFS with the values of x:%i, z:%i going to print the maze\n",x,z);
   showMaze();
-  // x+1 , z   = right
-  // x+1 , z+1
-  // x   , z+1 = down
-  // x-1 , z+1
-  // x-1 , z   = left
-  // x-1 , z-1
-  // x   , z-1 = top
-  // x+1 , z-1
+  // all the possible values
+    // x+1 , z   = right
+    // x+1 , z+1
+    // x   , z+1 = down
+    // x-1 , z+1
+    // x-1 , z   = left
+    // x-1 , z-1
+    // x   , z-1 = top
+    // x+1 , z-1
+  // end of all the possible values
   /* int possibleX[] = {x+1 , x+1 , x   , x-1 , x-1 , x-1 , x   , x+1}; */
   /* int possibleZ[] = {z   , z+1 , z+1 , z+1 , z   , z-1 , z-1 , z-1}; */
   int possibleX[] = {x+1 , x   , x-1 , x   };
@@ -330,37 +321,41 @@ void terrain::startDFS(int x, int z){
 
   // make a loop that goes through all of em
   int numberOfPlaces = 0;
-  for(int i = 0; i < 8; i++){
+  for(int i = 0; i < sizeof(possibleX)/sizeof(possibleX[0]); i++){
     int curX = possibleX[i];
     int curZ = possibleZ[i];
-    /* printf("at curX:%i and curZ:%i \n",curX,curZ); */
-    if(curX >= sizeX-1 || curZ >= sizeZ-1) continue;
+    printf("at curX:%i and curZ:%i \n",curX,curZ);
+    if(curX >= sizeX-1 || curZ >= sizeZ-1 || curX < 0 || curZ < 0) continue;
     if(mazeHeightMap[curX][curZ] >= 10) continue;
-    /* printf("  incresing number of places, for curX:%i and curZ:%i \n",curX,curZ); */
+    printf("  incresing number of places, for curX:%i and curZ:%i \n",curX,curZ);
     numberOfPlaces++;
   }
+
   printf("numberOfPlaces:%i\n",numberOfPlaces);
   if(numberOfPlaces == 0) return;
   int chosenPath = rand()%numberOfPlaces;
+  printf("chosenPath:%i numberOfPlaces:%i\n", chosenPath, numberOfPlaces);
   numberOfPlaces = 0;
-  for(int i = 0; i< 8; i++){
+  for(int i = 0; i< sizeof(possibleX)/sizeof(possibleX[0]); i++){
     int curX = possibleX[i];
-    int curZ = possibleX[i];
-    if(curX >= sizeX-1 || curZ >= sizeZ-1) continue;
+    int curZ = possibleZ[i];
+    if(curX >= sizeX-1 || curZ >= sizeZ-1 || curX < 0 || curZ < 0) continue;
     if(mazeHeightMap[curX][curZ] >= 10) continue;
-    numberOfPlaces++;
     if(chosenPath == numberOfPlaces){
       //chose this path
       int dirX = x-curX;
       int dirZ = z-curZ;
-      printf("x:%i,curX:%i,  y:%i,curY:%i,  dirX:%i dirY:%i\n", x,curX, z,curZ,  dirX, dirZ);
-      /* mazeHeightMap[curX+dirX][curZ+dirZ] = 16; */
-      /* mazeHeightMap[curX][curZ] = 11; */
-      /* mazeHeightMap[curX+dirX][curZ+dirZ] = 16; */
-      startDFS(curX+dirX,curZ+dirZ);
+      /* printf("x:%i,curX:%i,  z:%i,curZ:%i,  dirX:%i dirZ:%i\n", x,curX, z,curZ,  dirX, dirZ); */
+      /* printf("x:%i,curX:%i,  z:%i,curZ:%i,  dirX:%i dirZ:%i\n", x,curX, z,curZ,  dirX, dirZ); */
+      printf("oldPos:(%i,%i), newPos:(%i,%i)  dir:(%i,%i)\n", x,z,curX,curZ, dirX, dirZ);
+      mazeHeightMap[curX+dirZ][curZ+dirX] = 16;
+      mazeHeightMap[curX     ][curZ     ] = 11;
+      mazeHeightMap[curX-dirZ][curZ-dirX] = 16;
+      startDFS(curX,curZ);
       /* startDFS(x,z); */
       return;
     }
+    numberOfPlaces++;
   }
 
   //end of function
