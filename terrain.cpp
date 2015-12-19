@@ -257,7 +257,7 @@ void terrain::generateMaze(CCamera *cam){
   // make everything equal to -1
   for (int x = 0; x < sizeX; ++x) {
     for (int z = 0; z < sizeZ; ++z) {
-      mazeHeightMap[x][z] = -1;
+      mazeHeightMap[x][z] = 5;
     }
   }
 
@@ -287,6 +287,7 @@ void terrain::generateMaze(CCamera *cam){
   mazeHeightMap[startX][startZ] = 11;
   showMaze();
   cam->setPosition(startX*10-(sizeX/2)*10 + 5, 0, startZ*10-(sizeZ/2)*10 + 5);
+  /* printf("cameraPosition:(%f,%f,%f)\n", cam->Position.x, cam->Position.y, cam->Position.z); */
 
   // starting the DFS
   int xStep = startX, zStep = startZ;
@@ -294,8 +295,8 @@ void terrain::generateMaze(CCamera *cam){
   if(xStep == 0 || xStep == sizeX-1)      xStep += 1 - 2*(xStep)/(sizeX-1);
   else if(zStep == 0 || zStep == sizeZ-1) zStep += 1 - 2*(zStep)/(sizeZ-1);
   printf("xStep:%i, zStep:%i, sizeX:%i, sizeZ:%i\n",xStep, zStep, sizeX, sizeZ);
-  /* mazeHeightMap[xStep][zStep] = 11; */
-  /* startDFS(xStep, zStep); */
+  mazeHeightMap[xStep][zStep] = 11;
+  startDFS(xStep, zStep);
 
   // make all the numbers normal, from 0 or 5
   for (int i = 0; i < sizeX; i++) {
@@ -353,11 +354,11 @@ void terrain::startDFS(int x, int z){
       /* mazeHeightMap[curX+dirZ][curZ+dirX] = 16; */
       /* mazeHeightMap[curX     ][curZ     ] = 11; */
       /* mazeHeightMap[curX-dirZ][curZ-dirX] = 16; */
-      mazeHeightMap[x+dirZ][z+dirX] = 16;
+      /* mazeHeightMap[x+dirZ][z+dirX] = 16; */
       mazeHeightMap[x     ][z     ] = 11;
-      mazeHeightMap[x-dirZ][z-dirX] = 16;
+      /* mazeHeightMap[x-dirZ][z-dirX] = 16; */
       startDFS(curX,curZ);
-      /* startDFS(x,z); */
+      startDFS(x,z);
       return;
     }
     numberOfPlaces++;
