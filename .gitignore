@@ -1,6 +1,7 @@
 
 
 #ignore all the .o files
+.DS_Store
 *.o
 3DMazeGame
 
