@@ -22,6 +22,10 @@ using namespace std;
 
 #define ShowUpvector
 
+//minimap globals:
+int wallSize = 20;		//size of a 2D wall
+int dotSize = 5;		//size of the player's (camera's) dot.
+
 CCamera Camera;
 
 int windowWidth = 600;
@@ -262,7 +266,7 @@ bool Intersect(int x, int y){
 	return false; //else returns false
 }
 
-void display(void) {
+void display_main(void) {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
@@ -334,6 +338,28 @@ void display(void) {
 	glutSwapBuffers();
 }
 
+void display_minimap(){
+	glBegin(GL_POINTS);
+	glPointSize(wallSize);
+	//loop will draw all pixels on the map
+	for (int x=0; x < sizeX; x++){
+		for (int z=0; z < sizeZ; z++){
+			if (mazeHeightMap[x][z] != 0){	//if not 0 (wakable path), draw a wall
+				glColor3f(0.0f, 0.0f, 0.0f);
+				glVertex2f(x, z);
+			}
+		}
+	}
+	glEnd();
+
+	glBegin(GL_POINTS);
+	glPointSize(dotSize);
+	glColor3f(0.0f,1.0f,0.0f);		//Color of the player dot is green
+	glVertex2f(*playerX, *playerZ); //The position of the camera
+	glEnd();
+	glFlush();
+}
+
 void special(int key, int x, int y) {
 	// int fx = camFocus[0];
 	// int fz = camFocus[2];
@@ -397,7 +423,7 @@ void special(int key, int x, int y) {
 			break;
 	}
 
-	// Call display function
+	// Call display_main function
 	glutPostRedisplay();
 }
 
@@ -411,29 +437,29 @@ void keyboard(unsigned char key, int x, int y) {
 			Camera.ViewDir.y += 0.1;
 			camYDirCounter++;
 			printf("ViewY:%f\n", Camera.ViewDir.y*1000000);
-			display();
+			display_main();
 			break;
 		case 's':
 			// Camera.RotateX(-5.0);
 			Camera.ViewDir.y -= 0.1;
 			camYDirCounter--;
 			printf("ViewY:%f\n", Camera.ViewDir.y*1000000);
-			display();
+			display_main();
 			break;
 		case 'd':
 			Camera.RotateY(-1.0);
-			display();
+			display_main();
 			break;
 		case 'a':
 			Camera.RotateY(1.0);
-			display();
+			display_main();
 			break;
 		case ' ':
 			// Intersect(int(Camera.ViewDir.x), int(Camera.ViewDir.z));
 			if (Intersect(x,y)) {
 				sphereAlive = false;
 				printf("Sphere is dead\n");
-				display();
+				display_main();
 			}
 			break;
 	}
@@ -444,7 +470,7 @@ void mouse(int button, int state, int x, int y){
 		if (Intersect(x,y)) {
 			sphereAlive = false;
 			printf("Sphere is dead\n");
-			display();
+			display_main();
 		}
 	}
 }
@@ -496,6 +522,7 @@ int main(int argc, char** argv) {
 	glutCreateWindow("Minimap");
 	glClearColor(0,0,0,0);
 	glClear(GL_COLOR_BUFFER_BIT);
+	glutDisplayFunc(display_minimap);
 
 
 	glutInitWindowPosition(0, 0);
@@ -511,7 +538,7 @@ int main(int argc, char** argv) {
 	Camera.Move( F3dVector(-31.0, playerHeight, 35.0 ));
 	Camera.MoveForward( 1.0 );
 
-	glutDisplayFunc(display);	//registers "display" as the display callback function
+	glutDisplayFunc(display_main);	//registers "display_main" as the display_main callback function
 	glutReshapeFunc(reshape);
 	glutKeyboardFunc(keyboard);
 	glutSpecialFunc(special);
