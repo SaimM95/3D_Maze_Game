@@ -293,6 +293,7 @@ void terrain::generateMaze(){
   if(xStep == 0 || xStep == sizeX-1)      xStep += 1 - 2*(xStep)/(sizeX-1);
   else if(zStep == 0 || zStep == sizeZ-1) zStep += 1 - 2*(zStep)/(sizeZ-1);
   printf("xStep:%i, zStep:%i, sizeX:%i, sizeZ:%i\n",xStep, zStep, sizeX, sizeZ);
+  /* mazeHeightMap[xStep][zStep] = 11; */
   startDFS(xStep, zStep);
 
   // make all the numbers normal, from 0 or 5
@@ -347,12 +348,13 @@ void terrain::startDFS(int x, int z){
       //chose this path
       int dirX = x-curX;
       int dirZ = z-curZ;
-      /* printf("x:%i,curX:%i,  z:%i,curZ:%i,  dirX:%i dirZ:%i\n", x,curX, z,curZ,  dirX, dirZ); */
-      /* printf("x:%i,curX:%i,  z:%i,curZ:%i,  dirX:%i dirZ:%i\n", x,curX, z,curZ,  dirX, dirZ); */
       printf("oldPos:(%i,%i), newPos:(%i,%i)  dir:(%i,%i)\n", x,z,curX,curZ, dirX, dirZ);
-      mazeHeightMap[curX+dirZ][curZ+dirX] = 16;
-      mazeHeightMap[curX     ][curZ     ] = 11;
-      mazeHeightMap[curX-dirZ][curZ-dirX] = 16;
+      /* mazeHeightMap[curX+dirZ][curZ+dirX] = 16; */
+      /* mazeHeightMap[curX     ][curZ     ] = 11; */
+      /* mazeHeightMap[curX-dirZ][curZ-dirX] = 16; */
+      mazeHeightMap[x+dirZ][z+dirX] = 16;
+      mazeHeightMap[x     ][z     ] = 11;
+      mazeHeightMap[x-dirZ][z-dirX] = 16;
       startDFS(curX,curZ);
       /* startDFS(x,z); */
       return;
@@ -363,65 +365,6 @@ void terrain::startDFS(int x, int z){
   //end of function
 }
 
-/* void terrain::startDFS(int x, int z){ */
-  /* printf("\n\nstarting the DFS with the values of x:%i, z:%i going to print the maze\n",x,z); */
-  /* showMaze(); */
-  /* // all the possible values */
-  /*   // x+1 , z   = right */
-  /*   // x+1 , z+1 */
-  /*   // x   , z+1 = down */
-  /*   // x-1 , z+1 */
-  /*   // x-1 , z   = left */
-  /*   // x-1 , z-1 */
-  /*   // x   , z-1 = top */
-  /*   // x+1 , z-1 */
-  /* // end of all the possible values */
-  /* /1* int possibleX[] = {x+1 , x+1 , x   , x-1 , x-1 , x-1 , x   , x+1}; *1/ */
-  /* /1* int possibleZ[] = {z   , z+1 , z+1 , z+1 , z   , z-1 , z-1 , z-1}; *1/ */
-  /* int possibleX[] = {x+1 , x   , x-1 , x   }; */
-  /* int possibleZ[] = {z   , z+1 , z   , z-1 }; */
-
-  /* // make a loop that goes through all of em */
-  /* int numberOfPlaces = 0; */
-  /* for(int i = 0; i < sizeof(possibleX)/sizeof(possibleX[0]); i++){ */
-  /*   int curX = possibleX[i]; */
-  /*   int curZ = possibleZ[i]; */
-  /*   printf("at curX:%i and curZ:%i \n",curX,curZ); */
-  /*   if(curX >= sizeX-1 || curZ >= sizeZ-1 || curX < 0 || curZ < 0) continue; */
-  /*   if(mazeHeightMap[curX][curZ] >= 10) continue; */
-  /*   printf("  incresing number of places, for curX:%i and curZ:%i \n",curX,curZ); */
-  /*   numberOfPlaces++; */
-  /* } */
-
-  /* printf("numberOfPlaces:%i\n",numberOfPlaces); */
-  /* if(numberOfPlaces == 0) return; */
-  /* int chosenPath = rand()%numberOfPlaces; */
-  /* printf("chosenPath:%i numberOfPlaces:%i\n", chosenPath, numberOfPlaces); */
-  /* numberOfPlaces = 0; */
-  /* for(int i = 0; i< sizeof(possibleX)/sizeof(possibleX[0]); i++){ */
-  /*   int curX = possibleX[i]; */
-  /*   int curZ = possibleZ[i]; */
-  /*   if(curX >= sizeX-1 || curZ >= sizeZ-1 || curX < 0 || curZ < 0) continue; */
-  /*   if(mazeHeightMap[curX][curZ] >= 10) continue; */
-  /*   if(chosenPath == numberOfPlaces){ */
-  /*     //chose this path */
-  /*     int dirX = x-curX; */
-  /*     int dirZ = z-curZ; */
-  /*     /1* printf("x:%i,curX:%i,  z:%i,curZ:%i,  dirX:%i dirZ:%i\n", x,curX, z,curZ,  dirX, dirZ); *1/ */
-  /*     /1* printf("x:%i,curX:%i,  z:%i,curZ:%i,  dirX:%i dirZ:%i\n", x,curX, z,curZ,  dirX, dirZ); *1/ */
-  /*     printf("oldPos:(%i,%i), newPos:(%i,%i)  dir:(%i,%i)\n", x,z,curX,curZ, dirX, dirZ); */
-  /*     mazeHeightMap[curX+dirZ][curZ+dirX] = 16; */
-  /*     mazeHeightMap[curX     ][curZ     ] = 11; */
-  /*     mazeHeightMap[curX-dirZ][curZ-dirX] = 16; */
-  /*     startDFS(curX,curZ); */
-  /*     /1* startDFS(x,z); *1/ */
-  /*     return; */
-  /*   } */
-  /*   numberOfPlaces++; */
-  /* } */
-
-  /* //end of function */
-/* } */
 
 // Private function: Print out the mazeHeightMap array
 void terrain::showMaze() {
