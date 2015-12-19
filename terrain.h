@@ -94,7 +94,7 @@ private:
 	vector<vertex3D>*faceNormals;
 	vector<vertex3D>*vertexNormals;
 
-	void generateMaze(int halfWidth, int halfLength);
+	void generateMaze();
 	void showMaze();
 	void calcFaceNormals();
 	void calcVertexNormals();

@@ -22,10 +22,15 @@ terrain::terrain(int sizeX, int sizeZ, int height) {
 	this->sizeZ = sizeZ;
 	this->height = height;
 
+    sizeX = (sizeX%2==0)? (sizeX+1):(sizeX);
+    sizeZ = (sizeZ%2==0)? (sizeZ+1):(sizeZ);
+    printf("sizeX:%i  sizeZ:%i\n",sizeX,sizeZ);
+
 	verts = new vector<vertex3D>((sizeX+1)*(sizeZ+1));
 	faces = new vector<faces3D>(sizeX*sizeZ);
 	faceNormals = new vector<vertex3D>(faces->size());
 	vertexNormals = new vector<vertex3D>(verts->size());
+    printf("verts.size():%li\n",verts->size());
 
 	// mazeHeightMap is a 2d representation of the maze where each element's value is either 0 (walkable path)
 	// or height (wall)
@@ -44,9 +49,8 @@ terrain::terrain(int sizeX, int sizeZ, int height) {
 
 // Load the maze terrain
 void terrain::load() {
-	generateMaze(sizeX/2, sizeZ/2);
+	generateMaze();
 	showMaze();
-
 	// Use maze2d.mazeHeightMap[][] for height (y-coords) of each vertex
 	// ...
 	// Populate verts, faces, faceNormals and vertexNormals arrays
@@ -54,14 +58,17 @@ void terrain::load() {
 
 	// Set x, y, z values for all the vertices in such a way that it translates into a flat plane of points
 	// i.e. all points have height 0
+    printf("verts.size():%li\n", verts->size());
 	int vertexCount = 0;
 	for (int x = (-sizeX/2)*10; x <= (sizeX/2)*10; x+=10) {
 		for (int z = (sizeZ/2)*10; z >= (-sizeZ/2)*10; z-=10) {
+            printf("in loop x:%i z:%i  vertexCount;%i\n",x,z,vertexCount);
 			verts->at(vertexCount).set(x,0,z);
 			vertexCount++;
 		}
 	}
 
+    printf("done the first for loop in laod \n");
 	// for (int x = 0; x <= sizeX; ++x) {
 	// 	for (int z = 0; z <= sizeZ; ++z) {
 	// 		printf("heightX:%d heightZ:%d Height:%f\n", x, z, mazeHeightMap[x][z]);
@@ -73,12 +80,14 @@ void terrain::load() {
 	int xCount = 0;
 	int heightX = 0;
 	int heightZ = 0;
+    printf("faces.size():%li\n",faces->size());
 	for (int f = 0; f < faces->size(); ++f) {
 		if (f > 0 && f%sizeX == 0) xCount++;
 		int v1 = f+sizeZ+1+xCount;
 		int v2 = f+sizeZ+2+xCount;
 		int v3 = f+1+xCount;
 		int v4 = f+0+xCount;
+        printf("v1:%i, v2:%i, v3:%i, v4:%i\n",v1,v2,v3,v4);
 
 		faces->at(f).set(verts->at(v1),verts->at(v2),verts->at(v3),verts->at(v4));
 
@@ -101,7 +110,9 @@ void terrain::load() {
 		}
 	}
 
+    printf("going inside the calcFacenormals\n");
 	calcFaceNormals();
+    printf("going to calculate the vertex normals\n");
 	calcVertexNormals();
 }
 
@@ -246,16 +257,10 @@ bool terrain::checkCollision(float xPos, float zPos) {
 	/* mazeHeightMap[7][8] = 5; */
 	/* mazeHeightMap[8][9] = 0; */
 /* } */
-void terrain::generateMaze(int halfWidth, int halfLength){
-  sizeX = halfWidth+1;
-  sizeZ = halfLength+1;
-  for(int i =0; i < sizeX; i++) delete mazeHeightMap[i];
-  delete mazeHeightMap;
+void terrain::generateMaze(){
 
-  mazeHeightMap = new int*[sizeX]; // create the grid
   // make everything equal to -1
   for (int x = 0; x < sizeX; ++x) {
-    mazeHeightMap[x] = new int[sizeZ]; // create the width
     for (int z = 0; z < sizeZ; ++z) {
       mazeHeightMap[x][z] = -1;
     }
