@@ -299,6 +299,20 @@ void terrain::generateMaze(CCamera *cam){
   mazeHeightMap[xStep][zStep] = 11;
   startDFS(xStep, zStep);
 
+  //make the exit
+  int endX = 0, endZ = 0;
+  if(rand()%2 > 0){
+    endX = (rand()%(sizeX/2)) * 2 + 1;//rand()%(sizeX-2)+1;
+    endZ = (rand()%2 > 0)? 0:sizeZ-1;
+  }else{
+    endX = (rand()%2 > 0)? 0:sizeX-1;
+    endZ = (rand()%(sizeZ/2)) * 2 + 1;//rand()%(sizeZ-2)+1;
+  }
+  printf("endX:%i, endZ:%i\n",endX,endZ);
+  mazeHeightMap[endX][endZ] = 11;
+  showMaze();
+
+
   // make all the numbers normal, from 0 or 5
   for (int i = 0; i < sizeX; i++) {
     for (int j = 0; j < sizeZ; j++){
@@ -308,6 +322,7 @@ void terrain::generateMaze(CCamera *cam){
   }
 
   printf("done the start making terrain function\n");
+
 }
 void terrain::startDFS(int x, int z){
   mazeHeightMap[x][z] = 11;
