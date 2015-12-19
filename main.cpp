@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h>
+#include <cmath>
 #include "terrain.h"
 #include "camera.h"		// Source: http://www.codecolony.de/opengl.htm#Camera2
 
@@ -10,7 +10,6 @@
 #  include <GLUT/glut.h>
 #else
 #  include <GL/glut.h>
-#  include <stdlib.h>
 #  include <GL/glut.h>
 #  include <GL/gl.h>
 #  include <GL/glu.h>
@@ -61,7 +60,8 @@ GLubyte *img_data;
 int width, height, maximum;
 
 int fpsCount = 0;
-int mouseX = 0, oldMouseX = 0, mouseRateOfChange = 0;
+int mouseX = 0, oldMouseX = 0, mouseDisplacement = 0, changeInTime = 0;
+float oldMouseVelocity = 0, mouseVelocity = 0, mouseAcceleration = 0;
 
 GLubyte* LoadPPM(char* file, int* width, int* height, int* max) {
 	GLubyte* img;
@@ -269,16 +269,45 @@ void display(void) {
 
 	Camera.Render();
 
+	// if (fpsCount % 60 == 0) {
+	// 	fpsCount = 0;
+	// }
 	// fpsCount++;
-	// if (fpsCount % 10 == 0) {
-		mouseRateOfChange = mouseX - oldMouseX;
-		printf("FPSCnt: %d  Change in mouse: %d\n", fpsCount, mouseRateOfChange);
-		// fpsCount = 0;
-		oldMouseX = mouseX;
+
+	// mouseDisplacement = 300 - mouseX;
+	// glutWarpPointer(600 / 2, 600 / 2);
+
+	oldMouseVelocity = mouseVelocity;
+	
+	if (changeInTime > 0) {
+		mouseVelocity = (float) mouseDisplacement / (float) changeInTime;
+		mouseAcceleration = (mouseVelocity - oldMouseVelocity) / (float) changeInTime;
+		printf("Time:%d OldX:%d CurrX:%d Displacement:%d OldVelocity:%f CurrVelocity:%f Acceleration:%f\n", 
+			changeInTime, oldMouseX, mouseX, mouseDisplacement, oldMouseVelocity, mouseVelocity, mouseAcceleration);
+	}
+	// printf("FPSCnt: %d  Change in mouse: %d\n", fpsCount, mouseDisplacement);
+
+	// if (mouseAcceleration > 0)
+		// if (mouseAcceleration > 0) 
+		// 	printf("Change in mouse: %d  FPSCnt: %d  Mouse Acceleration: %f\n", mouseDisplacement, fpsCount, mouseAcceleration);
+			// printf("Mouse Acceleration: %f\n", mouseAcceleration);
+
+	// if (mouseDisplacement > 0) {
+	// 	Camera.RotateY(-1.0*abs(mouseDisplacement));
+	// 	changeInTime = fpsCount - changeInTime;
+	// }
+	// else if (mouseDisplacement < 0) {
+	// 	Camera.RotateY(1.0*abs(mouseDisplacement));
+	// 	changeInTime = fpsCount - changeInTime;
+	// }
+	// else {
+	// 	fpsCount = 0;
+	// 	changeInTime = 0;
 	// }
 
-	if (mouseRateOfChange > 0) Camera.RotateY(-1.0);
-	else if (mouseRateOfChange < 0) Camera.RotateY(1.0);
+	// Camera.RotateY(mouseDisplacement);
+
+	oldMouseX = mouseX;
 
 	// gluLookAt(	Camera.Position.x,Camera.Position.y,Camera.Position.z,
 	// 			Camera.ViewDir.x + Camera.Position.x,Camera.ViewDir.y + Camera.Position.y,Camera.ViewDir.z + Camera.Position.z,
@@ -437,12 +466,10 @@ void keyboard(unsigned char key, int x, int y) {
 			moveCamBackward();
 			break;
 		case 'd':
-			Camera.RotateY(-1.0);
-			display();
+			Camera.StrafeRight(-1.0);
 			break;
 		case 'a':
-			Camera.RotateY(1.0);
-			display();
+			Camera.StrafeRight(1.0);
 			break;
 		case ' ':
 			// Intersect(int(Camera.ViewDir.x), int(Camera.ViewDir.z));
@@ -460,10 +487,7 @@ void keyboard(unsigned char key, int x, int y) {
 void mouse(int button, int state, int x, int y){
 	if(button ==  GLUT_LEFT_BUTTON && state == GLUT_DOWN){
 		Intersect(x,y);
-		Camera.ViewDir.x = endL[0];
-		Camera.ViewDir.y = endL[1];
-		Camera.ViewDir.z = endL[2];
-		glutPostRedisplay();
+		// glutPostRedisplay();
 	}
 }
 
@@ -479,6 +503,16 @@ void passive(int x, int y) {
 
 	// passiveCounter++;
 	mouseX = x;
+
+	mouseDisplacement = mouseX - 300;
+	glutWarpPointer(600 / 2, 600 / 2);
+
+	if (mouseDisplacement > 0) {
+		Camera.RotateY(-1.0);
+	}
+	else if (mouseDisplacement < 0) {
+		Camera.RotateY(1.0);
+	}
 }
 
 void init(void) {
