@@ -348,7 +348,7 @@ void display_minimap(){
 		for (int z=0; z < terrainSizeZ; z++){
 			if (mazeTerrain.mazeHeightMap[x][z] != 0){	//if not 0 (wakable path), draw a wall
 			glColor3f(1.0f, 1.0f, 1.0f);
-			glVertex2f(x, z);
+			glVertex2f(x+0.5, z+0.5);
 			}
 		}
 	}
