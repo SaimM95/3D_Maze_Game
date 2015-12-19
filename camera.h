@@ -1,3 +1,5 @@
+#ifndef _CAMERA_H_
+#define _CAMERA_H_
 //***************************************************************************
 //
 // Advanced CodeColony Camera
@@ -38,16 +40,16 @@ SF3dVector F3dVector ( GLfloat x, GLfloat y, GLfloat z );
 class CCamera
 {
 private:
-	
 
-	GLfloat RotatedX, RotatedY, RotatedZ;	
-	
+
+	GLfloat RotatedX, RotatedY, RotatedZ;
+
 public:
 	SF3dVector ViewDir;
-	SF3dVector RightVector;	
+	SF3dVector RightVector;
 	SF3dVector UpVector;
 	SF3dVector Position;
-	
+
 	CCamera();				//inits the values (Position: (0|0|0) Target: (0|0|-1) )
 	void Render ( void );	//executes some glRotates and a glTranslate command
 							//Note: You should call glLoadIdentity before using Render
@@ -56,6 +58,7 @@ public:
 	void RotateX ( GLfloat Angle );
 	void RotateY ( GLfloat Angle );
 	void RotateZ ( GLfloat Angle );
+    void setPosition(int x, int y, int z);
 
 	void MoveForward ( GLfloat Distance );
 	void MoveUpward ( GLfloat Distance );
@@ -66,4 +69,4 @@ public:
 
 };
 
-
+#endif

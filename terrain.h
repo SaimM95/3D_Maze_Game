@@ -2,6 +2,7 @@
 #define _TERRAIN_H_
 
 #include <vector>
+#include "camera.h"
 
 #ifdef __APPLE__
 #  include <OpenGL/gl.h>
@@ -84,7 +85,7 @@ public:
 	int **mazeHeightMap;
 
 	terrain(int sizeX, int sizeZ, int height);
-	void load();
+	void load(CCamera * cam);
 	void draw();
 	bool checkCollision(float xPos, float zPos);
 
@@ -94,7 +95,7 @@ private:
 	vector<vertex3D>*faceNormals;
 	vector<vertex3D>*vertexNormals;
 
-	void generateMaze();
+	void generateMaze(CCamera *cam);
 	void showMaze();
 	void calcFaceNormals();
 	void calcVertexNormals();
