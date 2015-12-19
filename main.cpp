@@ -23,6 +23,7 @@ using namespace std;
 #define ShowUpvector
 
 //minimap globals:
+int win_minimap;
 int wallSize = 20;		//size of a 2D wall
 int dotSize = 5;		//size of the player's (camera's) dot.
 
@@ -339,22 +340,25 @@ void display_main(void) {
 }
 
 void display_minimap(){
-	// glBegin(GL_POINTS);
-	// glPointSize(wallSize);
-	// //loop will draw all pixels on the map
-	// for (int x=0; x < sizeX; x++){
-	// 	for (int z=0; z < sizeZ; z++){
-	// 		if (mazeHeightMap[x][z] != 0){	//if not 0 (wakable path), draw a wall
-	// 			glColor3f(0.0f, 0.0f, 0.0f);
-	// 			glVertex2f(x, z);
-	// 		}
-	// 	}
-	// }
-	// glEnd();
+	glClear(GL_COLOR_BUFFER_BIT);
+	glPointSize(wallSize);
+	glBegin(GL_POINTS);
+	//loop will draw all pixels on the map
+	for (int x=0; x < terrainSizeX; x++){
+		for (int z=0; z < terrainSizeZ; z++){
+			if (mazeTerrain.mazeHeightMap[x][z] != 0){	//if not 0 (wakable path), draw a wall
+			glColor3f(1.0f, 1.0f, 1.0f);
+			glVertex2f(x, z);
+			}
+		}
+	}
+	glEnd();
 
+	glutSetWindow(win_minimap);
 	glBegin(GL_POINTS);
 	glPointSize(dotSize);
-	glColor3f(0.0f,1.0f,0.0f);		//Color of the player dot is green
+	glColor3f(1.0f,1.0f,1.0f);		//Color of the player dot is green
+	printf("Position:%f,%f,%f\n", Camera.Position.x, Camera.Position.y, Camera.Position.z);
 	glVertex2f(Camera.Position.x, Camera.Position.z); //The position of the camera
 	glEnd();
 	glFlush();
@@ -519,10 +523,11 @@ int main(int argc, char** argv) {
 	glutInitWindowPosition(700,50);
 	glutInitWindowSize(200,200);
 	glutInitDisplayMode(GLUT_RGB | GLUT_SINGLE);
-	glutCreateWindow("Minimap");
-	glClearColor(0,0,0,0);
-	glClear(GL_COLOR_BUFFER_BIT);
+	win_minimap = glutCreateWindow("Minimap");
 	glutDisplayFunc(display_minimap);
+	glClearColor(0,0,0,0);
+	glLoadIdentity();
+	gluOrtho2D(0, terrainSizeX, 0, terrainSizeZ);
 
 
 	glutInitWindowPosition(0, 0);
