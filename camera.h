@@ -63,7 +63,6 @@ public:
 
 	void showPosition();
 	void showViewPoint();
-
 };
 
 

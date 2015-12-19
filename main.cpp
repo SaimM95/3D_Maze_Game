@@ -339,23 +339,23 @@ void display_main(void) {
 }
 
 void display_minimap(){
-	glBegin(GL_POINTS);
-	glPointSize(wallSize);
-	//loop will draw all pixels on the map
-	for (int x=0; x < sizeX; x++){
-		for (int z=0; z < sizeZ; z++){
-			if (mazeHeightMap[x][z] != 0){	//if not 0 (wakable path), draw a wall
-				glColor3f(0.0f, 0.0f, 0.0f);
-				glVertex2f(x, z);
-			}
-		}
-	}
-	glEnd();
+	// glBegin(GL_POINTS);
+	// glPointSize(wallSize);
+	// //loop will draw all pixels on the map
+	// for (int x=0; x < sizeX; x++){
+	// 	for (int z=0; z < sizeZ; z++){
+	// 		if (mazeHeightMap[x][z] != 0){	//if not 0 (wakable path), draw a wall
+	// 			glColor3f(0.0f, 0.0f, 0.0f);
+	// 			glVertex2f(x, z);
+	// 		}
+	// 	}
+	// }
+	// glEnd();
 
 	glBegin(GL_POINTS);
 	glPointSize(dotSize);
 	glColor3f(0.0f,1.0f,0.0f);		//Color of the player dot is green
-	glVertex2f(*playerX, *playerZ); //The position of the camera
+	glVertex2f(Camera.Position.x, Camera.Position.z); //The position of the camera
 	glEnd();
 	glFlush();
 }
