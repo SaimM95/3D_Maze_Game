@@ -60,6 +60,9 @@ bool sphereAlive = true;
 GLubyte *img_data;
 int width, height, maximum;
 
+int fpsCount = 0;
+int mouseX = 0, oldMouseX = 0, mouseRateOfChange = 0;
+
 GLubyte* LoadPPM(char* file, int* width, int* height, int* max) {
 	GLubyte* img;
 	FILE *fd;
@@ -175,15 +178,12 @@ void drawCrosshair() {
     gluPerspective(40.0,(GLdouble)windowWidth/(GLdouble)windowHeight,0.5,400.0);
 }
 
-bool Intersect(int x, int y){
+void Intersect(int x, int y){
 	printf("%i, %i\n", x, y);
 
 	//allocate matricies memory
 	double matModelView[16], matProjection[16];
 	int viewport[4];
-
-	//vectors
-
 
 	//grab the matricies
 	glGetDoublev(GL_MODELVIEW_MATRIX, matModelView);
@@ -209,57 +209,57 @@ bool Intersect(int x, int y){
 	//check for intersection against sphere!
 	//hurray!
 
-	double A, B, C;
+	// double A, B, C;
 
-	double R0x, R0y, R0z;
-	double Rdx, Rdy, Rdz;
+	// double R0x, R0y, R0z;
+	// double Rdx, Rdy, Rdz;
 
-	R0x = start[0];
-	R0y = start[1];
-	R0z = start[2];
+	// R0x = start[0];
+	// R0y = start[1];
+	// R0z = start[2];
 
-	Rdx = endL[0] - start[0];
-	Rdy = endL[1] - start[1];
-	Rdz = endL[2] - start[2];
+	// Rdx = endL[0] - start[0];
+	// Rdy = endL[1] - start[1];
+	// Rdz = endL[2] - start[2];
 
-	//magnitude!
-	double M = sqrt(Rdx*Rdx + Rdy*Rdy + Rdz* Rdz);
+	// //magnitude!
+	// double M = sqrt(Rdx*Rdx + Rdy*Rdy + Rdz* Rdz);
 
-	//unit vector!
-	Rdx /= M;
-	Rdy /= M;
-	Rdz /= M;
+	// //unit vector!
+	// Rdx /= M;
+	// Rdy /= M;
+	// Rdz /= M;
 
-	//A = Rd dot Rd
-	A = Rdx*Rdx + Rdy*Rdy + Rdz*Rdz;
+	// //A = Rd dot Rd
+	// A = Rdx*Rdx + Rdy*Rdy + Rdz*Rdz;
 
-	double Btempx, Btempy, Btempz;
-	Btempx = R0x;
-	Btempy =  R0y;
-	Btempz =  R0z;
+	// double Btempx, Btempy, Btempz;
+	// Btempx = R0x;
+	// Btempy =  R0y;
+	// Btempz =  R0z;
 
-	B = (Btempx-15) * Rdx + (Btempy-2) * Rdy + (Btempz-11) *Rdz;
-	B *= 2.0;
+	// B = (Btempx-15) * Rdx + (Btempy-2) * Rdy + (Btempz-11) *Rdz;
+	// B *= 2.0;
 
-	C = (R0x-15)*(R0x-15) + (R0y-2)*(R0y-2) + (R0z-11)*(R0z-11) - 1;
-
-
-	double sq = B*B  - 4*A*C;
-
-	double t0 = 0, t1 = 0;
-
-	if(sq < 0)
-		printf("no Intersection!!!\n");
-	else{
-		t0 = ((-1) * B + sqrt(sq))/(2*A);
-		t1 = ((-1) * B - sqrt(sq))/(2*A);
-
-		printf("Intersection at: t = %f, and t = %f\n", t0, t1);
-		return true;
-	}
+	// C = (R0x-15)*(R0x-15) + (R0y-2)*(R0y-2) + (R0z-11)*(R0z-11) - 1;
 
 
-	return false; //else returns false
+	// double sq = B*B  - 4*A*C;
+
+	// double t0 = 0, t1 = 0;
+
+	// if(sq < 0)
+	// 	printf("no Intersection!!!\n");
+	// else{
+	// 	t0 = ((-1) * B + sqrt(sq))/(2*A);
+	// 	t1 = ((-1) * B - sqrt(sq))/(2*A);
+
+	// 	printf("Intersection at: t = %f, and t = %f\n", t0, t1);
+	// 	return true;
+	// }
+
+
+	// return false; //else returns false
 }
 
 void display(void) {
@@ -268,6 +268,17 @@ void display(void) {
 	glLoadIdentity();
 
 	Camera.Render();
+
+	// fpsCount++;
+	// if (fpsCount % 10 == 0) {
+		mouseRateOfChange = mouseX - oldMouseX;
+		printf("FPSCnt: %d  Change in mouse: %d\n", fpsCount, mouseRateOfChange);
+		// fpsCount = 0;
+		oldMouseX = mouseX;
+	// }
+
+	if (mouseRateOfChange > 0) Camera.RotateY(-1.0);
+	else if (mouseRateOfChange < 0) Camera.RotateY(1.0);
 
 	// gluLookAt(	Camera.Position.x,Camera.Position.y,Camera.Position.z,
 	// 			Camera.ViewDir.x + Camera.Position.x,Camera.ViewDir.y + Camera.Position.y,Camera.ViewDir.z + Camera.Position.z,
@@ -330,8 +341,58 @@ void display(void) {
 		glPopMatrix();
 	}
 
+	// printf("blah\n");
+
 	glFlush();
 	glutSwapBuffers();
+}
+
+void moveCamForward() {
+	// "Pretend" to move forward
+	Camera.MoveForward( -1 );
+
+	// Restrict movement along the y-axis (i.e can't fly or go through the ground)
+	if (camYDirCounter != 0) {
+		Camera.MoveForward(1);		// reset pretend move
+		return;
+	}
+
+	// If the "pretend" move doesn't cause a collision, actually move forward
+	// otherwise, reset the "pretend" move
+	if (!mazeTerrain.checkCollision(Camera.Position.x, Camera.Position.z) || moveForward == true) {
+		Camera.MoveForward( 1 );	// reset pretend move
+		Camera.MoveForward( -0.5 );	// actually move
+		moveForward = false;
+		moveBack = false;
+	}
+	else {
+		Camera.MoveForward( 1 );	// reset pretend move
+		moveBack = true;
+		printf("Move Back\n");
+	}
+}
+
+void moveCamBackward() {
+	// "Pretend" to move backward
+	Camera.MoveForward( 1 );
+
+	// Restrict movement along the y-axis (i.e can't fly or go through the ground)
+	if (camYDirCounter != 0) {
+		Camera.MoveForward(1);		// reset pretend move
+		return;
+	}
+
+	if (!mazeTerrain.checkCollision(Camera.Position.x, Camera.Position.z) || moveBack == true) {
+		Camera.MoveForward( -1 );	// reset pretend move
+		Camera.MoveForward( 0.5 );	// actually move
+		moveForward = false;
+		moveBack = false;
+	}
+	else {
+		Camera.MoveForward( -1 );	// reset pretend move
+		moveForward = true;
+		printf("Move Forward\n");
+	}
 }
 
 void special(int key, int x, int y) {
@@ -344,56 +405,19 @@ void special(int key, int x, int y) {
 
 	switch(key) {
 		case GLUT_KEY_UP:
-			// "Pretend" to move forward
-			Camera.MoveForward( -1 );
-
-			// Restrict movement along the y-axis (i.e can't fly or go through the ground)
-			if (camYDirCounter != 0) {
-				Camera.MoveForward(1);		// reset pretend move
-				return;
-			}
-
-			// If the "pretend" move doesn't cause a collision, actually move forward
-			// otherwise, reset the "pretend" move
-			if (!mazeTerrain.checkCollision(Camera.Position.x, Camera.Position.z) || moveForward == true) {
-				Camera.MoveForward( 1 );	// reset pretend move
-				Camera.MoveForward( -0.5 );	// actually move
-				moveForward = false;
-				moveBack = false;
-			}
-			else {
-				Camera.MoveForward( 1 );	// reset pretend move
-				moveBack = true;
-				printf("Move Back\n");
-			}
+			moveCamForward();
 			break;
 		case GLUT_KEY_DOWN:
-			// "Pretend" to move backward
-			Camera.MoveForward( 1 );
-
-			// Restrict movement along the y-axis (i.e can't fly or go through the ground)
-			if (camYDirCounter != 0) {
-				Camera.MoveForward(1);		// reset pretend move
-				return;
-			}
-
-			if (!mazeTerrain.checkCollision(Camera.Position.x, Camera.Position.z) || moveBack == true) {
-				Camera.MoveForward( -1 );	// reset pretend move
-				Camera.MoveForward( 0.5 );	// actually move
-				moveForward = false;
-				moveBack = false;
-			}
-			else {
-				Camera.MoveForward( -1 );	// reset pretend move
-				moveForward = true;
-				printf("Move Forward\n");
-			}
+			moveCamBackward();
 			break;
 		case GLUT_KEY_RIGHT:
 			Camera.RotateY(-3.0);
+			printf("View Direction: %f,%f,%f\n", Camera.ViewDir.x, Camera.ViewDir.y, Camera.ViewDir.z);
+			Intersect(x,y);
 			break;
 		case GLUT_KEY_LEFT:
 			Camera.RotateY(3.0);
+			printf("View Direction: %f,%f,%f\n", Camera.ViewDir.x, Camera.ViewDir.y, Camera.ViewDir.z);
 			break;
 	}
 
@@ -407,18 +431,10 @@ void keyboard(unsigned char key, int x, int y) {
 			exit(0);
 			break;
 		case 'w':
-			// Camera.RotateX(5.0);
-			Camera.ViewDir.y += 0.1;
-			camYDirCounter++;
-			printf("ViewY:%f\n", Camera.ViewDir.y*1000000);
-			display();
+			moveCamForward();
 			break;
 		case 's':
-			// Camera.RotateX(-5.0);
-			Camera.ViewDir.y -= 0.1;
-			camYDirCounter--;
-			printf("ViewY:%f\n", Camera.ViewDir.y*1000000);
-			display();
+			moveCamBackward();
 			break;
 		case 'd':
 			Camera.RotateY(-1.0);
@@ -430,23 +446,39 @@ void keyboard(unsigned char key, int x, int y) {
 			break;
 		case ' ':
 			// Intersect(int(Camera.ViewDir.x), int(Camera.ViewDir.z));
-			if (Intersect(x,y)) {
-				sphereAlive = false;
-				printf("Sphere is dead\n");
-				display();
-			}
+			// if (Intersect(x,y)) {
+			// 	sphereAlive = false;
+			// 	printf("Sphere is dead\n");
+			// 	display();
+			// }
 			break;
 	}
+
+	glutPostRedisplay();
 }
 
 void mouse(int button, int state, int x, int y){
 	if(button ==  GLUT_LEFT_BUTTON && state == GLUT_DOWN){
-		if (Intersect(x,y)) {
-			sphereAlive = false;
-			printf("Sphere is dead\n");
-			display();
-		}
+		Intersect(x,y);
+		Camera.ViewDir.x = endL[0];
+		Camera.ViewDir.y = endL[1];
+		Camera.ViewDir.z = endL[2];
+		glutPostRedisplay();
 	}
+}
+
+void passive(int x, int y) {
+	// printf("x:%d  y:%d\n", x-300,y-300);
+	// if (passiveCounter % 10 == 0) {
+		// Intersect(x,y);
+		// Camera.ViewDir.x = start[0];
+		// Camera.ViewDir.y = start[1];
+		// Camera.ViewDir.z = start[2];
+		// glutPostRedisplay();
+	// }
+
+	// passiveCounter++;
+	mouseX = x;
 }
 
 void init(void) {
@@ -503,11 +535,13 @@ int main(int argc, char** argv) {
 	Camera.Move( F3dVector(-31.0, playerHeight, 35.0 ));
 	Camera.MoveForward( 1.0 );
 
+	glutIdleFunc(display);		// Loops diplay function at 60 fps
 	glutDisplayFunc(display);	//registers "display" as the display callback function
 	glutReshapeFunc(reshape);
 	glutKeyboardFunc(keyboard);
 	glutSpecialFunc(special);
 	glutMouseFunc(mouse);
+	glutPassiveMotionFunc(passive); 
 
     /* TEXTURES */
 	glEnable(GL_TEXTURE_2D);
