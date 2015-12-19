@@ -471,6 +471,7 @@ void init(void) {
 }
 
 void reshape(int x, int y) {
+
 	if (y == 0 || x == 0) return;  //Nothing is visible then, so return
 
 	//Set a new projection matrix
@@ -488,11 +489,18 @@ void reshape(int x, int y) {
 int main(int argc, char** argv) {
 	glutInit(&argc, argv);		//starts up GLUT
 
-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
+	//Draws the minimap
+	glutInitWindowPosition(700,50);
+	glutInitWindowSize(200,200);
+	glutInitDisplayMode(GLUT_RGB | GLUT_SINGLE);
+	glutCreateWindow("Minimap");
+	glClearColor(0,0,0,0);
+	glClear(GL_COLOR_BUFFER_BIT);
 
-	glutInitWindowSize(600, 600);
+
 	glutInitWindowPosition(0, 0);
-
+	glutInitWindowSize(600, 600);
+	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
 	glutCreateWindow("3D Maze Game");	//creates the window
 
 	// initialize random seed
