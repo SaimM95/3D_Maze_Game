@@ -81,6 +81,7 @@ private:
 	void calcFaceNormals();
 	void calcVertexNormals();
 	void drawWall(int v1, int v2);
+	float* convertHeightMapToFace(int i, int j);
 };
 
 #endif
