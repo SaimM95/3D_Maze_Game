@@ -528,13 +528,8 @@ int main(int argc, char** argv) {
 	glutCreateWindow("3D Maze Game");	//creates the window
 
 	// initialize random seed
-	srand((0));
-
-    /* time_t seconds; */
-    /* time(&seconds); */
-    /* srand((unsigned int) seconds); */
-    /* srand(time(NULL)); */
-    srand(0);
+	/* srand((0)); */
+    srand(time(NULL));
 
 
 	mazeTerrain.load(&Camera);
