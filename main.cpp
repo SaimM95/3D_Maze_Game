@@ -207,23 +207,6 @@ void Intersect(int x, int y){
 	printf("far point: %f,%f,%f\n", endL[0], endL[1], endL[2]);
 }
 
-void moveCamWithMouse() {
-	mouseDisplacement = mouseX - oldMouseX;
-
-	if (mouseDisplacement > 0) Camera.RotateY(-1.0);
-	else if (mouseDisplacement < 0)	Camera.RotateY(1.0);
-	else {
-		// fpsCount++;
-		// if (fpsCount%60 == 0) {
-			// glutWarpPointer(300, 300);
-		// 	fpsCount = 0;
-		// }
-		// printf("FPSCount: %d\n", fpsCount);
-	}
-
-	oldMouseX = mouseX;
-}
-
 void display(void) {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glMatrixMode(GL_MODELVIEW);
@@ -342,13 +325,6 @@ void moveCamBackward() {
 }
 
 void special(int key, int x, int y) {
-	// int fx = camFocus[0];
-	// int fz = camFocus[2];
-	// int px = camPos[0];
-	// int pz = camPos[2];
-	// float slope = (fz - pz) / (fx - px);
-	// float b = fz - (slope*fx);
-
 	switch(key) {
 		case GLUT_KEY_UP:
 			moveCamForward();
@@ -409,28 +385,8 @@ void mouse(int button, int state, int x, int y){
 }
 
 void passive(int x, int y) {
-	// printf("x:%d  y:%d\n", x-300,y-300);
-	// if (passiveCounter % 10 == 0) {
-		// Intersect(x,y);
-		// Camera.ViewDir.x = start[0];
-		// Camera.ViewDir.y = start[1];
-		// Camera.ViewDir.z = start[2];
-		// glutPostRedisplay();
-	// }
-
-	// passiveCounter++;
 	mouseX = x;
 	glutPostRedisplay();
-
-	// mouseDisplacement = mouseX - 300;
-	// glutWarpPointer(600 / 2, 600 / 2);
-
-	// if (mouseDisplacement > 0) {
-	// 	Camera.RotateY(-1.0);
-	// }
-	// else if (mouseDisplacement < 0) {
-	// 	Camera.RotateY(1.0);
-	// }
 }
 
 void init(void) {
@@ -445,8 +401,6 @@ void init(void) {
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	//glOrtho(-2, 2, -2, 2, -2, 2);
-	// gluPerspective(45, 1, 1, 400);
 
 	//enable backface culling
     glFrontFace(GL_CCW);
@@ -461,8 +415,6 @@ void reshape(int x, int y) {
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	//Angle of view:40 degrees
-	//Near clipping plane distance: 0.5
-	//Far clipping plane distance: 20.0
 	gluPerspective(40.0,(GLdouble)x/(GLdouble)y,0.5,400.0);
 
 	glMatrixMode(GL_MODELVIEW);
