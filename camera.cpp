@@ -94,11 +94,31 @@ CCamera::CCamera()
 	//Init with standard OGL values:
 	Position = F3dVector (0.0, 0.0,	0.0);
 	ViewDir = F3dVector( 1.0, 0.0, 0.0);
-	RightVector = F3dVector (1.0, 0.0, 0.0);
 	UpVector = F3dVector (0.0, 1.0, 0.0);
+	// RightVector = F3dVector (1.0, 0.0, 0.0);
+	RightVector = CrossProduct(&ViewDir, &UpVector)*(-1);
 
 	//Only to be sure:
 	RotatedX = RotatedY = RotatedZ = 0.0;
+
+	yaw = 0;
+	mouseX = 0;
+	oldMouseX = 0;
+}
+
+void CCamera::MoveWithMouse(int x) {
+	mouseX = x - 300;
+
+	yaw = mouseX * 0.01;
+
+	// ViewDir.x = cos(yaw);
+	// ViewDir.z = sin(yaw);
+	RotateY(-yaw);
+	printf("Yaw:%f\n", yaw);
+
+	// RightVector = CrossProduct(&ViewDir, &UpVector)*(-1);
+
+	// oldMouseX = mouseX;
 }
 
 void CCamera::Move (SF3dVector Direction)

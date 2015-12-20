@@ -205,61 +205,23 @@ void Intersect(int x, int y){
 
 	printf("near point: %f,%f,%f\n", start[0], start[1], start[2]);
 	printf("far point: %f,%f,%f\n", endL[0], endL[1], endL[2]);
+}
 
-	//check for intersection against sphere!
-	//hurray!
+void moveCamWithMouse() {
+	mouseDisplacement = mouseX - oldMouseX;
 
-	// double A, B, C;
+	if (mouseDisplacement > 0) Camera.RotateY(-1.0);
+	else if (mouseDisplacement < 0)	Camera.RotateY(1.0);
+	else {
+		// fpsCount++;
+		// if (fpsCount%60 == 0) {
+			// glutWarpPointer(300, 300);
+		// 	fpsCount = 0;
+		// }
+		// printf("FPSCount: %d\n", fpsCount);
+	}
 
-	// double R0x, R0y, R0z;
-	// double Rdx, Rdy, Rdz;
-
-	// R0x = start[0];
-	// R0y = start[1];
-	// R0z = start[2];
-
-	// Rdx = endL[0] - start[0];
-	// Rdy = endL[1] - start[1];
-	// Rdz = endL[2] - start[2];
-
-	// //magnitude!
-	// double M = sqrt(Rdx*Rdx + Rdy*Rdy + Rdz* Rdz);
-
-	// //unit vector!
-	// Rdx /= M;
-	// Rdy /= M;
-	// Rdz /= M;
-
-	// //A = Rd dot Rd
-	// A = Rdx*Rdx + Rdy*Rdy + Rdz*Rdz;
-
-	// double Btempx, Btempy, Btempz;
-	// Btempx = R0x;
-	// Btempy =  R0y;
-	// Btempz =  R0z;
-
-	// B = (Btempx-15) * Rdx + (Btempy-2) * Rdy + (Btempz-11) *Rdz;
-	// B *= 2.0;
-
-	// C = (R0x-15)*(R0x-15) + (R0y-2)*(R0y-2) + (R0z-11)*(R0z-11) - 1;
-
-
-	// double sq = B*B  - 4*A*C;
-
-	// double t0 = 0, t1 = 0;
-
-	// if(sq < 0)
-	// 	printf("no Intersection!!!\n");
-	// else{
-	// 	t0 = ((-1) * B + sqrt(sq))/(2*A);
-	// 	t1 = ((-1) * B - sqrt(sq))/(2*A);
-
-	// 	printf("Intersection at: t = %f, and t = %f\n", t0, t1);
-	// 	return true;
-	// }
-
-
-	// return false; //else returns false
+	oldMouseX = mouseX;
 }
 
 void display(void) {
@@ -269,54 +231,9 @@ void display(void) {
 
 	Camera.Render();
 
-	// if (fpsCount % 60 == 0) {
-	// 	fpsCount = 0;
-	// }
-	// fpsCount++;
+	// moveCamWithMouse();
 
-	// mouseDisplacement = 300 - mouseX;
-	// glutWarpPointer(600 / 2, 600 / 2);
-
-	oldMouseVelocity = mouseVelocity;
-	
-	if (changeInTime > 0) {
-		mouseVelocity = (float) mouseDisplacement / (float) changeInTime;
-		mouseAcceleration = (mouseVelocity - oldMouseVelocity) / (float) changeInTime;
-		printf("Time:%d OldX:%d CurrX:%d Displacement:%d OldVelocity:%f CurrVelocity:%f Acceleration:%f\n", 
-			changeInTime, oldMouseX, mouseX, mouseDisplacement, oldMouseVelocity, mouseVelocity, mouseAcceleration);
-	}
-	// printf("FPSCnt: %d  Change in mouse: %d\n", fpsCount, mouseDisplacement);
-
-	// if (mouseAcceleration > 0)
-		// if (mouseAcceleration > 0) 
-		// 	printf("Change in mouse: %d  FPSCnt: %d  Mouse Acceleration: %f\n", mouseDisplacement, fpsCount, mouseAcceleration);
-			// printf("Mouse Acceleration: %f\n", mouseAcceleration);
-
-	// if (mouseDisplacement > 0) {
-	// 	Camera.RotateY(-1.0*abs(mouseDisplacement));
-	// 	changeInTime = fpsCount - changeInTime;
-	// }
-	// else if (mouseDisplacement < 0) {
-	// 	Camera.RotateY(1.0*abs(mouseDisplacement));
-	// 	changeInTime = fpsCount - changeInTime;
-	// }
-	// else {
-	// 	fpsCount = 0;
-	// 	changeInTime = 0;
-	// }
-
-	// Camera.RotateY(mouseDisplacement);
-
-	oldMouseX = mouseX;
-
-	// gluLookAt(	Camera.Position.x,Camera.Position.y,Camera.Position.z,
-	// 			Camera.ViewDir.x + Camera.Position.x,Camera.ViewDir.y + Camera.Position.y,Camera.ViewDir.z + Camera.Position.z,
-	// 			Camera.UpVector.x,Camera.UpVector.y,Camera.UpVector.z);
-
-	// Camera.showPosition();
-	// Camera.showViewPoint();
-
-	// gluLookAt(camPos[0], camPos[1], camPos[2], camFocus[0],camFocus[1],camFocus[2], upVect[0],upVect[1],upVect[2]);
+	Camera.MoveWithMouse(mouseX);
 
 	glColor3f(1,1,1); // White light color
 	glEnable(GL_LIGHT0);
@@ -466,10 +383,10 @@ void keyboard(unsigned char key, int x, int y) {
 			moveCamBackward();
 			break;
 		case 'd':
-			Camera.StrafeRight(-1.0);
+			Camera.StrafeRight(0.3);
 			break;
 		case 'a':
-			Camera.StrafeRight(1.0);
+			Camera.StrafeRight(-0.3);
 			break;
 		case ' ':
 			// Intersect(int(Camera.ViewDir.x), int(Camera.ViewDir.z));
@@ -503,16 +420,17 @@ void passive(int x, int y) {
 
 	// passiveCounter++;
 	mouseX = x;
+	glutPostRedisplay();
 
-	mouseDisplacement = mouseX - 300;
-	glutWarpPointer(600 / 2, 600 / 2);
+	// mouseDisplacement = mouseX - 300;
+	// glutWarpPointer(600 / 2, 600 / 2);
 
-	if (mouseDisplacement > 0) {
-		Camera.RotateY(-1.0);
-	}
-	else if (mouseDisplacement < 0) {
-		Camera.RotateY(1.0);
-	}
+	// if (mouseDisplacement > 0) {
+	// 	Camera.RotateY(-1.0);
+	// }
+	// else if (mouseDisplacement < 0) {
+	// 	Camera.RotateY(1.0);
+	// }
 }
 
 void init(void) {
@@ -560,6 +478,7 @@ int main(int argc, char** argv) {
 	glutInitWindowPosition(0, 0);
 
 	glutCreateWindow("3D Maze Game");	//creates the window
+	glutWarpPointer(300, 300);			// move cursor to middle of window
 
 	// initialize random seed
 	srand((0));
@@ -569,7 +488,7 @@ int main(int argc, char** argv) {
 	Camera.Move( F3dVector(-31.0, playerHeight, 35.0 ));
 	Camera.MoveForward( 1.0 );
 
-	glutIdleFunc(display);		// Loops diplay function at 60 fps
+	// glutIdleFunc(display);		// Loops diplay function at 60 fps
 	glutDisplayFunc(display);	//registers "display" as the display callback function
 	glutReshapeFunc(reshape);
 	glutKeyboardFunc(keyboard);

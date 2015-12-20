@@ -47,10 +47,14 @@ public:
 	SF3dVector RightVector;	
 	SF3dVector UpVector;
 	SF3dVector Position;
+	float yaw;
+	int mouseX, oldMouseX;
 	
 	CCamera();				//inits the values (Position: (0|0|0) Target: (0|0|-1) )
 	void Render ( void );	//executes some glRotates and a glTranslate command
 							//Note: You should call glLoadIdentity before using Render
+
+	void MoveWithMouse(int x);
 
 	void Move ( SF3dVector Direction );
 	void RotateX ( GLfloat Angle );
