@@ -63,8 +63,8 @@ void terrain::load(CCamera * cam) {
 	int vertexCount = 0;
 	/* for (int x = (-sizeX/2)*10; x <= (sizeX/2)*10; x+=10) { */
 	/* 	for (int z = (sizeZ/2)*10; z >= (-sizeZ/2)*10; z-=10) { */
-	for (int x = (-sizeX/2)*10; x < (sizeX/2)*10; x+=10) {
-		for (int z = (sizeZ/2 - 1)*10; z >= (-sizeZ/2)*10; z-=10) {
+	for (int x = (-sizeX/2)*10; x <= (sizeX/2)*10; x+=10) {
+		for (int z = (sizeZ/2)*10; z >= (-sizeZ/2)*10; z-=10) {
 
 			verts->at(vertexCount).set(x,0,z);
 			vertexCount++;
