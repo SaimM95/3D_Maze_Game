@@ -19,8 +19,8 @@ using namespace std;
 
 // Constructor
 terrain::terrain(int sizeX, int sizeZ, int height) {
-    sizeX = (sizeX%2==0)? (sizeX+1):(sizeX);
-    sizeZ = (sizeZ%2==0)? (sizeZ+1):(sizeZ);
+    /* sizeX = (sizeX%2==0)? (sizeX+1):(sizeX); */
+    /* sizeZ = (sizeZ%2==0)? (sizeZ+1):(sizeZ); */
     printf("sizeX:%i  sizeZ:%i\n",sizeX,sizeZ);
 
 	this->sizeX = sizeX;
@@ -114,10 +114,10 @@ void terrain::load(CCamera * cam) {
 
     /* faces3D curFace = faces->at(startX*sizeX + startZ); */
     /* faces3D curFace = faces->at(0*sizeX + 1); */
-    faces3D curFace = faces->at(1*sizeX + 1);
-    cam->setPosition((curFace.v1.x + curFace.v3.x)/2, 0, (curFace.v1.z+curFace.v3.z)/2);
-    printf("curFace v1:(%f,%f,%f)  v2:(%f,%f,%f)  v3:(%f,%f,%f)  v4:(%f,%f,%f)\n", curFace.v1.x, curFace.v1.y, curFace.v1.z, curFace.v2.x, curFace.v2.y, curFace.v2.z, curFace.v3.x, curFace.v3.y, curFace.v3.z, curFace.v4.x, curFace.v4.y, curFace.v4.z);
-    printf("cameraPosition:(%f,%f,%f)\n", cam->Position.x, cam->Position.y, cam->Position.z);
+    /* faces3D curFace = faces->at(1*sizeX + 1); */
+    /* cam->setPosition((curFace.v1.x + curFace.v3.x)/2, 0, (curFace.v1.z+curFace.v3.z)/2); */
+    /* printf("curFace v1:(%f,%f,%f)  v2:(%f,%f,%f)  v3:(%f,%f,%f)  v4:(%f,%f,%f)\n", curFace.v1.x, curFace.v1.y, curFace.v1.z, curFace.v2.x, curFace.v2.y, curFace.v2.z, curFace.v3.x, curFace.v3.y, curFace.v3.z, curFace.v4.x, curFace.v4.y, curFace.v4.z); */
+    /* printf("cameraPosition:(%f,%f,%f)\n", cam->Position.x, cam->Position.y, cam->Position.z); */
 
     printf("going inside the calcFacenormals\n");
 	calcFaceNormals();
