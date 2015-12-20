@@ -433,10 +433,12 @@ int main(int argc, char** argv) {
 	glutWarpPointer(300, 300);			// move cursor to middle of window
 
 	// initialize random seed
-	srand((0));
+	/* srand((0)); */
+    srand(time(NULL));
 
-	mazeTerrain.load();
 
+	mazeTerrain.load(&Camera);
+    /* Camera.setPosition(0,0,6); */
 	Camera.Move( F3dVector(-31.0, playerHeight, 35.0 ));
 	Camera.MoveForward( 1.0 );
 

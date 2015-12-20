@@ -92,7 +92,7 @@ float operator* (SF3dVector v, SF3dVector u)	//dot product
 CCamera::CCamera()
 {
 	//Init with standard OGL values:
-	Position = F3dVector (0.0, 0.0,	0.0);
+	Position = F3dVector (0.0, 0.0,0.0);
 	ViewDir = F3dVector( 1.0, 0.0, 0.0);
 	UpVector = F3dVector (0.0, 1.0, 0.0);
 	// RightVector = F3dVector (1.0, 0.0, 0.0);
@@ -111,15 +111,15 @@ void CCamera::MoveWithMouse(int x) {
 
 	yaw = mouseX * 0.01;
 
-	// ViewDir.x = cos(yaw);
-	// ViewDir.z = sin(yaw);
 	RotateY(-yaw);
-	printf("Yaw:%f\n", yaw);
-
-	// RightVector = CrossProduct(&ViewDir, &UpVector)*(-1);
-
-	// oldMouseX = mouseX;
+	// printf("Yaw:%f\n", yaw);
 }
+
+void CCamera::setPosition(int x, int y, int z){
+	this->Position = F3dVector (x, y, z);
+}
+
+
 
 void CCamera::Move (SF3dVector Direction)
 {
