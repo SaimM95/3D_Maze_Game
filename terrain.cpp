@@ -103,6 +103,10 @@ void terrain::load() {
 
 	calcFaceNormals();
 	calcVertexNormals();
+
+	// Testing convert function
+	// float *centerPoint = convertHeightMapToFace(1,1);
+	// printf("Center Point: %f,%f,%f\n", centerPoint[0], centerPoint[1], centerPoint[2]);
 }
 
 // Draw the terrain using glut functions
@@ -319,4 +323,16 @@ void terrain::drawWall(int v1, int v2) {
 		glTexCoord2f(1, 1);
 		glVertex3f(verts->at(v1).x, verts->at(v1).y + height, verts->at(v1).z);
 	glEnd();
+}
+
+float* terrain::convertHeightMapToFace(int i, int j) {
+	int faceIndex = (i*sizeX) + j;
+	float centerPoint[] = {0,0,0};
+
+	centerPoint[0] = (faces->at(faceIndex).v3.x + faces->at(faceIndex).v1.x) / 2;
+	centerPoint[2] = (faces->at(faceIndex).v3.z + faces->at(faceIndex).v1.z) / 2;
+
+	centerPoint[1] = mazeHeightMap[i][j];
+
+	return centerPoint;
 }
