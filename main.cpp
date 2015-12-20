@@ -347,7 +347,7 @@ void display_minimap(){
 	//loop will draw all pixels on the map
 	for (int x=0; x < terrainSizeX; x++){
 		for (int z=0; z < terrainSizeZ; z++){
-			if (mazeTerrain.mazeHeightMap[z][x] != 0){	//if not 0 (wakable path), draw a wall
+			if (mazeTerrain.mazeHeightMap[x][z] != 0){	//if not 0 (wakable path), draw a wall
 			glColor3f(1.0f, 1.0f, 1.0f);
 			glVertex2f(x+0.5, z+0.5);
 			}
@@ -355,12 +355,16 @@ void display_minimap(){
 	}
 	glEnd();
 
-	glutSetWindow(win_minimap);
-	glBegin(GL_POINTS);
+	//calculate player coord on minimap real quick:
+	float mx = (Camera.Position.x+49.0f)/9.5;
+	float mz = (Camera.Position.z-49.5f)/9.5*-1;
+
+	//glutSetWindow(win_minimap);
 	glPointSize(dotSize);
-	glColor3f(1.0f,1.0f,1.0f);		//Color of the player dot is green
-	printf("Position:%f,%f,%f\n", Camera.Position.x, Camera.Position.y, Camera.Position.z);
-	glVertex2f(Camera.Position.x, Camera.Position.z); //The position of the camera
+	glBegin(GL_POINTS);
+	glColor3f(0.0f,1.0f,0.0f);		//Color of the player dot is green
+	glVertex2f(mx, mz); //The position of the camera
+	//printf("Position:%f,%f,%f\n", (Camera.Position.x+49.0f)/9.5, Camera.Position.y, (Camera.Position.z-49.5f)/9.5f);
 	glEnd();
 	glFlush();
 }
@@ -501,6 +505,11 @@ void init(void) {
     glEnable(GL_CULL_FACE);
 }
 
+void resize(int x, int y){
+	//ignore params
+	glutReshapeWindow(200, 200);
+}
+
 void reshape(int x, int y) {
 
 	if (y == 0 || x == 0) return;  //Nothing is visible then, so return
@@ -517,6 +526,14 @@ void reshape(int x, int y) {
 	glViewport(0,0,x,y);  //Use the whole window for rendering
 }
 
+void glutCallbacks(){
+	glutDisplayFunc(display_main);	//registers "display_main" as the display_main callback function
+	glutReshapeFunc(reshape);
+	glutKeyboardFunc(keyboard);
+	glutSpecialFunc(special);
+	glutMouseFunc(mouse);
+}
+
 int main(int argc, char** argv) {
 	glutInit(&argc, argv);		//starts up GLUT
 
@@ -529,6 +546,7 @@ int main(int argc, char** argv) {
 	glClearColor(0,0,0,0);
 	glLoadIdentity();
 	gluOrtho2D(0, terrainSizeX, 0, terrainSizeZ);
+	glutReshapeFunc(resize);
 
 
 	glutInitWindowPosition(0, 0);
@@ -544,11 +562,7 @@ int main(int argc, char** argv) {
 	Camera.Move( F3dVector(-31.0, playerHeight, 35.0 ));
 	Camera.MoveForward( 1.0 );
 
-	glutDisplayFunc(display_main);	//registers "display_main" as the display_main callback function
-	glutReshapeFunc(reshape);
-	glutKeyboardFunc(keyboard);
-	glutSpecialFunc(special);
-	glutMouseFunc(mouse);
+	glutCallbacks();
 
     /* TEXTURES */
 	glEnable(GL_TEXTURE_2D);
