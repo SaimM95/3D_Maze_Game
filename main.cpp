@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h>
+#include <cmath>
 #include "terrain.h"
 #include "camera.h"		// Source: http://www.codecolony.de/opengl.htm#Camera2
 
@@ -183,7 +183,7 @@ void drawCrosshair() {
     gluPerspective(40.0,(GLdouble)windowWidth/(GLdouble)windowHeight,0.5,400.0);
 }
 
-bool Intersect(int x, int y){
+void Intersect(int x, int y){
 	printf("%i, %i\n", x, y);
 
 	//allocate matricies memory
@@ -309,53 +309,61 @@ void display_minimap(){
 	glFlush();
 }
 
+void moveCamForward() {
+	// "Pretend" to move forward
+	Camera.MoveForward( -1 );
+
+	// Restrict movement along the y-axis (i.e can't fly or go through the ground)
+	if (camYDirCounter != 0) {
+		Camera.MoveForward(1);		// reset pretend move
+		return;
+	}
+
+	// If the "pretend" move doesn't cause a collision, actually move forward
+	// otherwise, reset the "pretend" move
+	if (!mazeTerrain.checkCollision(Camera.Position.x, Camera.Position.z) || moveForward == true) {
+		Camera.MoveForward( 1 );	// reset pretend move
+		Camera.MoveForward( -0.5 );	// actually move
+		moveForward = false;
+		moveBack = false;
+	}
+	else {
+		Camera.MoveForward( 1 );	// reset pretend move
+		moveBack = true;
+		printf("Move Back\n");
+	}
+}
+
+void moveCamBackward() {
+	// "Pretend" to move backward
+	Camera.MoveForward( 1 );
+
+	// Restrict movement along the y-axis (i.e can't fly or go through the ground)
+	if (camYDirCounter != 0) {
+		Camera.MoveForward(1);		// reset pretend move
+		return;
+	}
+
+	if (!mazeTerrain.checkCollision(Camera.Position.x, Camera.Position.z) || moveBack == true) {
+		Camera.MoveForward( -1 );	// reset pretend move
+		Camera.MoveForward( 0.5 );	// actually move
+		moveForward = false;
+		moveBack = false;
+	}
+	else {
+		Camera.MoveForward( -1 );	// reset pretend move
+		moveForward = true;
+		printf("Move Forward\n");
+	}
+}
+
 void special(int key, int x, int y) {
 	switch(key) {
 		case GLUT_KEY_UP:
-			// "Pretend" to move forward
-			Camera.MoveForward( -1 );
-
-			// Restrict movement along the y-axis (i.e can't fly or go through the ground)
-			if (camYDirCounter != 0) {
-				Camera.MoveForward(1);		// reset pretend move
-				return;
-			}
-
-			// If the "pretend" move doesn't cause a collision, actually move forward
-			// otherwise, reset the "pretend" move
-			if (!mazeTerrain.checkCollision(Camera.Position.x, Camera.Position.z) || moveForward == true) {
-				Camera.MoveForward( 1 );	// reset pretend move
-				Camera.MoveForward( -0.5 );	// actually move
-				moveForward = false;
-				moveBack = false;
-			}
-			else {
-				Camera.MoveForward( 1 );	// reset pretend move
-				moveBack = true;
-				printf("Move Back\n");
-			}
+			moveCamForward();
 			break;
 		case GLUT_KEY_DOWN:
-			// "Pretend" to move backward
-			Camera.MoveForward( 1 );
-
-			// Restrict movement along the y-axis (i.e can't fly or go through the ground)
-			if (camYDirCounter != 0) {
-				Camera.MoveForward(1);		// reset pretend move
-				return;
-			}
-
-			if (!mazeTerrain.checkCollision(Camera.Position.x, Camera.Position.z) || moveBack == true) {
-				Camera.MoveForward( -1 );	// reset pretend move
-				Camera.MoveForward( 0.5 );	// actually move
-				moveForward = false;
-				moveBack = false;
-			}
-			else {
-				Camera.MoveForward( -1 );	// reset pretend move
-				moveForward = true;
-				printf("Move Forward\n");
-			}
+			moveCamBackward();
 			break;
 		case GLUT_KEY_RIGHT:
 			Camera.RotateY(-3.0);
@@ -375,18 +383,10 @@ void keyboard(unsigned char key, int x, int y) {
 			exit(0);
 			break;
 		case 'w':
-			// Camera.RotateX(5.0);
-			Camera.ViewDir.y += 0.1;
-			camYDirCounter++;
-			printf("ViewY:%f\n", Camera.ViewDir.y*1000000);
-			display_main();
+			moveCamForward();
 			break;
 		case 's':
-			// Camera.RotateX(-5.0);
-			Camera.ViewDir.y -= 0.1;
-			camYDirCounter--;
-			printf("ViewY:%f\n", Camera.ViewDir.y*1000000);
-			display_main();
+			moveCamBackward();
 			break;
 		case 'd':
 			Camera.StrafeRight(0.3);
@@ -396,13 +396,15 @@ void keyboard(unsigned char key, int x, int y) {
 			break;
 		case ' ':
 			// Intersect(int(Camera.ViewDir.x), int(Camera.ViewDir.z));
-			if (Intersect(x,y)) {
-				sphereAlive = false;
-				printf("Sphere is dead\n");
-				display_main();
-			}
+			// if (Intersect(x,y)) {
+			// 	sphereAlive = false;
+			// 	printf("Sphere is dead\n");
+			// 	display_main();
+			// }
 			break;
 	}
+
+	glutPostRedisplay();
 }
 
 void mouse(int button, int state, int x, int y){
