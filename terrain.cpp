@@ -21,7 +21,6 @@ using namespace std;
 terrain::terrain(int sizeX, int sizeZ, int height) {
     /* sizeX = (sizeX%2==0)? (sizeX+1):(sizeX); */
     /* sizeZ = (sizeZ%2==0)? (sizeZ+1):(sizeZ); */
-    printf("sizeX:%i  sizeZ:%i\n",sizeX,sizeZ);
 
 	this->sizeX = sizeX;
 	this->sizeZ = sizeZ;
@@ -31,7 +30,6 @@ terrain::terrain(int sizeX, int sizeZ, int height) {
 	faces = new vector<faces3D>(sizeX*sizeZ);
 	faceNormals = new vector<vertex3D>(faces->size());
 	vertexNormals = new vector<vertex3D>(verts->size());
-    printf("verts.size():%li\n",verts->size());
 
 	// mazeHeightMap is a 2d representation of the maze where each element's value is either 0 (walkable path)
 	// or height (wall)
@@ -51,7 +49,6 @@ terrain::terrain(int sizeX, int sizeZ, int height) {
 // Load the maze terrain
 void terrain::load(CCamera * cam) {
 	generateMaze(cam);
-    printf("sizeX:%i, sizeZ:%i\n",sizeX,sizeZ);
 	showMaze();
 	// Use maze2d.mazeHeightMap[][] for height (y-coords) of each vertex
 	// ...
@@ -89,20 +86,12 @@ void terrain::load(CCamera * cam) {
 		int v3 = f+1+xCount;
 		int v4 = f+0+xCount;
 
-        /* printf("v1:(%f,%f,%f), v2:%i, v3:%i, v4:%i\n",verts->at(v1).x,verts->at(v1).y,verts->at(v1).z  ,v2,v3,v4); */
 		faces->at(f).set(verts->at(v1),verts->at(v2),verts->at(v3),verts->at(v4));
 
 		verts->at(v1).addFace(f);
 		verts->at(v2).addFace(f);
 		verts->at(v3).addFace(f);
 		verts->at(v4).addFace(f);
-
-		// printf("heightX:%d heightZ:%d Height:%d\n", heightX, heightZ, mazeHeightMap[heightX][heightZ]);
-
-		// verts->at(v1).y = mazeHeightMap[heightX][heightZ];
-		// verts->at(v2).y = mazeHeightMap[heightX][heightZ];
-		// verts->at(v3).y = mazeHeightMap[heightX][heightZ];
-		// verts->at(v4).y = mazeHeightMap[heightX][heightZ];
 
 		heightZ++;
 		if (heightZ >= sizeZ) {
@@ -112,16 +101,7 @@ void terrain::load(CCamera * cam) {
 	}
 
 
-    /* faces3D curFace = faces->at(startX*sizeX + startZ); */
-    /* faces3D curFace = faces->at(0*sizeX + 1); */
-    /* faces3D curFace = faces->at(1*sizeX + 1); */
-    /* cam->setPosition((curFace.v1.x + curFace.v3.x)/2, 0, (curFace.v1.z+curFace.v3.z)/2); */
-    /* printf("curFace v1:(%f,%f,%f)  v2:(%f,%f,%f)  v3:(%f,%f,%f)  v4:(%f,%f,%f)\n", curFace.v1.x, curFace.v1.y, curFace.v1.z, curFace.v2.x, curFace.v2.y, curFace.v2.z, curFace.v3.x, curFace.v3.y, curFace.v3.z, curFace.v4.x, curFace.v4.y, curFace.v4.z); */
-    /* printf("cameraPosition:(%f,%f,%f)\n", cam->Position.x, cam->Position.y, cam->Position.z); */
-
-    printf("going inside the calcFacenormals\n");
 	calcFaceNormals();
-    printf("going to calculate the vertex normals\n");
 	calcVertexNormals();
 }
 
@@ -290,28 +270,23 @@ void terrain::generateMaze(CCamera *cam){
   //start adding walls
   int startX, startZ;
   if(rand()%2 > 0){
-    startX = (rand()%(sizeX/2)) * 2 + 1;//rand()%(sizeX-2)+1;
+    startX = (rand()%(sizeX/2)) * 2 + 1;
     startZ = (rand()%2 > 0)? 0:sizeZ-1;
   }else{
     startX = (rand()%2 > 0)? 0:sizeX-1;
-    startZ = (rand()%(sizeZ/2)) * 2 + 1;//rand()%(sizeZ-2)+1;
+    startZ = (rand()%(sizeZ/2)) * 2 + 1;
   }
-  printf("startX:%i, startZ:%i\n",startX,startZ);
   mazeHeightMap[startX][startZ] = 11;
-  showMaze();
+  /* showMaze(); */
   float* camPos = convertHeightMapToFace(startX, startZ);
   cam->setPosition(camPos[0], 1, camPos[2]);
 
-
-  /* cam->setPosition(0,5,0); */
-  printf("cameraPosition:(%f,%f,%f)\n", cam->Position.x, cam->Position.y, cam->Position.z);
+  /* printf("cameraPosition:(%f,%f,%f)\n", cam->Position.x, cam->Position.y, cam->Position.z); */
 
   // starting the DFS
   int xStep = startX, zStep = startZ;
-  printf("xStep:%i, zStep:%i\n",xStep, zStep);
   if(xStep == 0 || xStep == sizeX-1)      xStep += 1 - 2*(xStep)/(sizeX-1);
   else if(zStep == 0 || zStep == sizeZ-1) zStep += 1 - 2*(zStep)/(sizeZ-1);
-  printf("xStep:%i, zStep:%i, sizeX:%i, sizeZ:%i\n",xStep, zStep, sizeX, sizeZ);
   mazeHeightMap[xStep][zStep] = 11;
   startDFS(xStep, zStep);
 
@@ -324,9 +299,16 @@ void terrain::generateMaze(CCamera *cam){
     endX = (rand()%2 > 0)? 0:sizeX-1;
     endZ = (rand()%(sizeZ/2)) * 2 + 1;//rand()%(sizeZ-2)+1;
   }
-  printf("endX:%i, endZ:%i\n",endX,endZ);
+  /* printf("endX:%i, endZ:%i\n",endX,endZ); */
   mazeHeightMap[endX][endZ] = 11;
-  showMaze();
+
+  if(endX == sizeX-1 || endZ == sizeZ-1){
+    xStep = endX, zStep = endZ;
+    if(xStep == 0 || xStep == sizeX-1)      xStep += 1 - 2*(xStep)/(sizeX-1);
+    else if(zStep == 0 || zStep == sizeZ-1) zStep += 1 - 2*(zStep)/(sizeZ-1);
+    mazeHeightMap[xStep][zStep] = 11;
+  }
+  /* showMaze(); */
 
 
   // make all the numbers normal, from 0 or 5
@@ -337,12 +319,11 @@ void terrain::generateMaze(CCamera *cam){
     }
   }
 
-  printf("done the start making terrain function\n");
+  /* printf("done the start making terrain function\n"); */
 
 }
 void terrain::startDFS(int x, int z){
   mazeHeightMap[x][z] = 11;
-  printf("\n\nstarting the DFS with the values of x:%i, z:%i going to print the maze\n",x,z);
   /* showMaze(); */
   // all the possible values
     // x+1 , z   = right
@@ -364,17 +345,13 @@ void terrain::startDFS(int x, int z){
   for(int i = 0; i < sizeof(possibleX)/sizeof(possibleX[0]); i++){
     int curX = possibleX[i];
     int curZ = possibleZ[i];
-    printf("at curX:%i and curZ:%i \n",curX,curZ);
     if(curX >= sizeX-1 || curZ >= sizeZ-1 || curX <= 0 || curZ <= 0) continue;
     if(mazeHeightMap[curX][curZ] >= 10) continue;
-    printf("  incresing number of places, for curX:%i and curZ:%i \n",curX,curZ);
     numberOfPlaces++;
   }
 
-  printf("numberOfPlaces:%i\n",numberOfPlaces);
   if(numberOfPlaces == 0) return;
   int chosenPath = rand()%numberOfPlaces;
-  printf("chosenPath:%i numberOfPlaces:%i\n", chosenPath, numberOfPlaces);
   numberOfPlaces = 0;
   for(int i = 0; i< sizeof(possibleX)/sizeof(possibleX[0]); i++){
     int curX = possibleX[i];
@@ -387,14 +364,7 @@ void terrain::startDFS(int x, int z){
       dirX = (dirX!=0)? abs(dirX)/dirX:0;
       int dirZ = curZ-z;//z-curZ;
       dirZ = (dirZ!=0)? abs(dirZ)/dirZ:0;
-      printf("oldPos:(%i,%i), newPos:(%i,%i)  dir:(%i,%i)\n", x,z,curX,curZ, dirX, dirZ);
-      /* mazeHeightMap[curX+dirZ][curZ+dirX] = 16; */
-      /* mazeHeightMap[curX     ][curZ     ] = 11; */
-      /* mazeHeightMap[curX-dirZ][curZ-dirX] = 16; */
-      /* mazeHeightMap[x+dirZ][z+dirX] = 16; */
       mazeHeightMap[x+dirX     ][z+dirZ     ] = 11;
-      /* mazeHeightMap[x-dirZ][z-dirX] = 16; */
-      /* startDFS(x+dirX*2,z+dirZ*2); */
       startDFS(curX,curZ);
       startDFS(x,z);
       return;
