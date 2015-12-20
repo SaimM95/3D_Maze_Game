@@ -51,6 +51,7 @@ terrain::terrain(int sizeX, int sizeZ, int height) {
 // Load the maze terrain
 void terrain::load(CCamera * cam) {
 	generateMaze(cam);
+    printf("sizeX:%i, sizeZ:%i\n",sizeX,sizeZ);
 	showMaze();
 	// Use maze2d.mazeHeightMap[][] for height (y-coords) of each vertex
 	// ...
@@ -60,8 +61,10 @@ void terrain::load(CCamera * cam) {
 	// Set x, y, z values for all the vertices in such a way that it translates into a flat plane of points
 	// i.e. all points have height 0
 	int vertexCount = 0;
-	for (int x = (-sizeX/2)*10; x <= (sizeX/2)*10; x+=10) {
-		for (int z = (sizeZ/2)*10; z >= (-sizeZ/2)*10; z-=10) {
+	/* for (int x = (-sizeX/2)*10; x <= (sizeX/2)*10; x+=10) { */
+	/* 	for (int z = (sizeZ/2)*10; z >= (-sizeZ/2)*10; z-=10) { */
+	for (int x = (-sizeX/2)*10; x < (sizeX/2)*10; x+=10) {
+		for (int z = (sizeZ/2 - 1)*10; z >= (-sizeZ/2)*10; z-=10) {
 			verts->at(vertexCount).set(x,0,z);
 			vertexCount++;
 		}
@@ -288,7 +291,8 @@ void terrain::generateMaze(CCamera *cam){
   mazeHeightMap[startX][startZ] = 11;
   showMaze();
   cam->setPosition(startX*10-(sizeX/2)*10 + 5, 0, startZ*10-(sizeZ/2)*10 + 5);
-  /* printf("cameraPosition:(%f,%f,%f)\n", cam->Position.x, cam->Position.y, cam->Position.z); */
+  /* cam->setPosition(0,5,0); */
+  printf("cameraPosition:(%f,%f,%f)\n", cam->Position.x, cam->Position.y, cam->Position.z);
 
   // starting the DFS
   int xStep = startX, zStep = startZ;
@@ -327,7 +331,7 @@ void terrain::generateMaze(CCamera *cam){
 void terrain::startDFS(int x, int z){
   mazeHeightMap[x][z] = 11;
   printf("\n\nstarting the DFS with the values of x:%i, z:%i going to print the maze\n",x,z);
-  showMaze();
+  /* showMaze(); */
   // all the possible values
     // x+1 , z   = right
     // x+1 , z+1
