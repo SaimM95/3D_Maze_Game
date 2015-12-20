@@ -299,10 +299,8 @@ void terrain::generateMaze(CCamera *cam){
   printf("startX:%i, startZ:%i\n",startX,startZ);
   mazeHeightMap[startX][startZ] = 11;
   showMaze();
-  /* cam->setPosition(startX*10-(sizeX/2)*10 + 5, 0, startZ*10-(sizeZ/2)*10 + 5); */
-  /* cam->setPosition(startZ*10-(sizeZ/2)*10 + 5, 0, startX*10-(sizeX/2)*10 + 5); */
   float* camPos = convertHeightMapToFace(startX, startZ);
-  cam->setPosition(camPos[0], 2, camPos[2]);
+  cam->setPosition(camPos[0], 1, camPos[2]);
 
 
   /* cam->setPosition(0,5,0); */
