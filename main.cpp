@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <cmath>
+#include <math.h>
 #include "terrain.h"
 #include "camera.h"		// Source: http://www.codecolony.de/opengl.htm#Camera2
 
@@ -10,6 +10,7 @@
 #  include <GLUT/glut.h>
 #else
 #  include <GL/glut.h>
+#  include <stdlib.h>
 #  include <GL/glut.h>
 #  include <GL/gl.h>
 #  include <GL/glu.h>
@@ -21,14 +22,20 @@ using namespace std;
 
 #define ShowUpvector
 
+int terrainSizeX = 10;
+int terrainSizeZ = 10;
+terrain mazeTerrain(terrainSizeX, terrainSizeZ, 5);
+
+//minimap globals:
+int win_minimap;
+int wallSize;			//size of a 2D wall
+int dotSize = 5;		//size of the player's (camera's) dot.
+
 CCamera Camera;
 
 int windowWidth = 600;
 int windowHeight = 600;
 
-int terrainSizeX = 10;
-int terrainSizeZ = 10;
-terrain mazeTerrain(terrainSizeX, terrainSizeZ, 5);
 
 float upVect[] = {0,1,0};
 float camPos[] = {50,0,50};
@@ -58,10 +65,6 @@ bool sphereAlive = true;
 /* TEXTURE */
 GLubyte *img_data;
 int width, height, maximum;
-
-int fpsCount = 0;
-int mouseX = 0, oldMouseX = 0, mouseDisplacement = 0, changeInTime = 0;
-float oldMouseVelocity = 0, mouseVelocity = 0, mouseAcceleration = 0;
 
 GLubyte* LoadPPM(char* file, int* width, int* height, int* max) {
 	GLubyte* img;
@@ -178,12 +181,15 @@ void drawCrosshair() {
     gluPerspective(40.0,(GLdouble)windowWidth/(GLdouble)windowHeight,0.5,400.0);
 }
 
-void Intersect(int x, int y){
+bool Intersect(int x, int y){
 	printf("%i, %i\n", x, y);
 
 	//allocate matricies memory
 	double matModelView[16], matProjection[16];
 	int viewport[4];
+
+	//vectors
+
 
 	//grab the matricies
 	glGetDoublev(GL_MODELVIEW_MATRIX, matModelView);
@@ -207,14 +213,12 @@ void Intersect(int x, int y){
 	printf("far point: %f,%f,%f\n", endL[0], endL[1], endL[2]);
 }
 
-void display(void) {
+void display_main(void) {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
 	Camera.Render();
-
-	// moveCamWithMouse();
 
 	Camera.MoveWithMouse(mouseX);
 
@@ -270,80 +274,96 @@ void display(void) {
 		glPopMatrix();
 	}
 
-	// printf("blah\n");
-
 	glFlush();
 	glutSwapBuffers();
 }
 
-void moveCamForward() {
-	// "Pretend" to move forward
-	Camera.MoveForward( -1 );
+void display_minimap(){
+	glClear(GL_COLOR_BUFFER_BIT);
+	glPointSize(200/terrainSizeX);
+	glBegin(GL_POINTS);
+	//loop will draw all pixels on the map
+	for (int x=0; x < terrainSizeX; x++){
+		for (int z=0; z < terrainSizeZ; z++){
+			if (mazeTerrain.mazeHeightMap[x][z] != 0){	//if not 0 (wakable path), draw a wall
+			glColor3f(1.0f, 1.0f, 1.0f);
+			glVertex2f(x+0.5, z+0.5);
+			}
+		}
+	}
+	glEnd();
 
-	// Restrict movement along the y-axis (i.e can't fly or go through the ground)
-	if (camYDirCounter != 0) {
-		Camera.MoveForward(1);		// reset pretend move
-		return;
-	}
+	//calculate player coord on minimap real quick:
+	float mx = (Camera.Position.x+49.0f)/9.5;
+	float mz = (Camera.Position.z-49.5f)/9.5*-1;
 
-	// If the "pretend" move doesn't cause a collision, actually move forward
-	// otherwise, reset the "pretend" move
-	if (!mazeTerrain.checkCollision(Camera.Position.x, Camera.Position.z) || moveForward == true) {
-		Camera.MoveForward( 1 );	// reset pretend move
-		Camera.MoveForward( -0.5 );	// actually move
-		moveForward = false;
-		moveBack = false;
-	}
-	else {
-		Camera.MoveForward( 1 );	// reset pretend move
-		moveBack = true;
-		printf("Move Back\n");
-	}
-}
-
-void moveCamBackward() {
-	// "Pretend" to move backward
-	Camera.MoveForward( 1 );
-
-	// Restrict movement along the y-axis (i.e can't fly or go through the ground)
-	if (camYDirCounter != 0) {
-		Camera.MoveForward(1);		// reset pretend move
-		return;
-	}
-
-	if (!mazeTerrain.checkCollision(Camera.Position.x, Camera.Position.z) || moveBack == true) {
-		Camera.MoveForward( -1 );	// reset pretend move
-		Camera.MoveForward( 0.5 );	// actually move
-		moveForward = false;
-		moveBack = false;
-	}
-	else {
-		Camera.MoveForward( -1 );	// reset pretend move
-		moveForward = true;
-		printf("Move Forward\n");
-	}
+	//glutSetWindow(win_minimap);
+	glPointSize(dotSize);
+	glBegin(GL_POINTS);
+	glColor3f(0.0f,1.0f,0.0f);		//Color of the player dot is green
+	glVertex2f(mx, mz); //The position of the camera
+	//printf("Position:%f,%f,%f\n", (Camera.Position.x+49.0f)/9.5, Camera.Position.y, (Camera.Position.z-49.5f)/9.5f);
+	glEnd();
+	glFlush();
 }
 
 void special(int key, int x, int y) {
 	switch(key) {
 		case GLUT_KEY_UP:
-			moveCamForward();
+			// "Pretend" to move forward
+			Camera.MoveForward( -1 );
+
+			// Restrict movement along the y-axis (i.e can't fly or go through the ground)
+			if (camYDirCounter != 0) {
+				Camera.MoveForward(1);		// reset pretend move
+				return;
+			}
+
+			// If the "pretend" move doesn't cause a collision, actually move forward
+			// otherwise, reset the "pretend" move
+			if (!mazeTerrain.checkCollision(Camera.Position.x, Camera.Position.z) || moveForward == true) {
+				Camera.MoveForward( 1 );	// reset pretend move
+				Camera.MoveForward( -0.5 );	// actually move
+				moveForward = false;
+				moveBack = false;
+			}
+			else {
+				Camera.MoveForward( 1 );	// reset pretend move
+				moveBack = true;
+				printf("Move Back\n");
+			}
 			break;
 		case GLUT_KEY_DOWN:
-			moveCamBackward();
+			// "Pretend" to move backward
+			Camera.MoveForward( 1 );
+
+			// Restrict movement along the y-axis (i.e can't fly or go through the ground)
+			if (camYDirCounter != 0) {
+				Camera.MoveForward(1);		// reset pretend move
+				return;
+			}
+
+			if (!mazeTerrain.checkCollision(Camera.Position.x, Camera.Position.z) || moveBack == true) {
+				Camera.MoveForward( -1 );	// reset pretend move
+				Camera.MoveForward( 0.5 );	// actually move
+				moveForward = false;
+				moveBack = false;
+			}
+			else {
+				Camera.MoveForward( -1 );	// reset pretend move
+				moveForward = true;
+				printf("Move Forward\n");
+			}
 			break;
 		case GLUT_KEY_RIGHT:
 			Camera.RotateY(-3.0);
-			printf("View Direction: %f,%f,%f\n", Camera.ViewDir.x, Camera.ViewDir.y, Camera.ViewDir.z);
-			Intersect(x,y);
 			break;
 		case GLUT_KEY_LEFT:
 			Camera.RotateY(3.0);
-			printf("View Direction: %f,%f,%f\n", Camera.ViewDir.x, Camera.ViewDir.y, Camera.ViewDir.z);
 			break;
 	}
 
-	// Call display function
+	// Call display_main function
 	glutPostRedisplay();
 }
 
@@ -353,10 +373,18 @@ void keyboard(unsigned char key, int x, int y) {
 			exit(0);
 			break;
 		case 'w':
-			moveCamForward();
+			// Camera.RotateX(5.0);
+			Camera.ViewDir.y += 0.1;
+			camYDirCounter++;
+			printf("ViewY:%f\n", Camera.ViewDir.y*1000000);
+			display_main();
 			break;
 		case 's':
-			moveCamBackward();
+			// Camera.RotateX(-5.0);
+			Camera.ViewDir.y -= 0.1;
+			camYDirCounter--;
+			printf("ViewY:%f\n", Camera.ViewDir.y*1000000);
+			display_main();
 			break;
 		case 'd':
 			Camera.StrafeRight(0.3);
@@ -366,19 +394,17 @@ void keyboard(unsigned char key, int x, int y) {
 			break;
 		case ' ':
 			// Intersect(int(Camera.ViewDir.x), int(Camera.ViewDir.z));
-			// if (Intersect(x,y)) {
-			// 	sphereAlive = false;
-			// 	printf("Sphere is dead\n");
-			// 	display();
-			// }
+			if (Intersect(x,y)) {
+				sphereAlive = false;
+				printf("Sphere is dead\n");
+				display_main();
+			}
 			break;
 	}
-
-	glutPostRedisplay();
 }
 
 void mouse(int button, int state, int x, int y){
-	if(button ==  GLUT_LEFT_BUTTON && state == GLUT_DOWN){
+	if(button ==  GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
 		Intersect(x,y);
 		// glutPostRedisplay();
 	}
@@ -408,7 +434,13 @@ void init(void) {
     glEnable(GL_CULL_FACE);
 }
 
+void resize(int x, int y){
+	//ignore params
+	glutReshapeWindow(200, 200);
+}
+
 void reshape(int x, int y) {
+
 	if (y == 0 || x == 0) return;  //Nothing is visible then, so return
 
 	//Set a new projection matrix
@@ -421,14 +453,33 @@ void reshape(int x, int y) {
 	glViewport(0,0,x,y);  //Use the whole window for rendering
 }
 
+void glutCallbacks(){
+	glutDisplayFunc(display_main);	//registers "display_main" as the display_main callback function
+	glutReshapeFunc(reshape);
+	glutKeyboardFunc(keyboard);
+	glutSpecialFunc(special);
+	glutMouseFunc(mouse);
+	glutPassiveMotionFunc(passive); 
+}
+
 int main(int argc, char** argv) {
 	glutInit(&argc, argv);		//starts up GLUT
 
-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
+	//Draws the minimap
+	glutInitWindowPosition(700,50);
+	glutInitWindowSize(200,200);
+	glutInitDisplayMode(GLUT_RGB | GLUT_SINGLE);
+	win_minimap = glutCreateWindow("Minimap");
+	glutDisplayFunc(display_minimap);
+	glClearColor(0,0,0,0);
+	glLoadIdentity();
+	gluOrtho2D(0, terrainSizeX, 0, terrainSizeZ);
+	glutReshapeFunc(resize);
 
-	glutInitWindowSize(600, 600);
+
 	glutInitWindowPosition(0, 0);
-
+	glutInitWindowSize(600, 600);
+	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
 	glutCreateWindow("3D Maze Game");	//creates the window
 	glutWarpPointer(300, 300);			// move cursor to middle of window
 
@@ -444,13 +495,7 @@ int main(int argc, char** argv) {
 	Camera.Move( F3dVector(-31.0, playerHeight, 35.0 ));
 	Camera.MoveForward( 1.0 );
 
-	// glutIdleFunc(display);		// Loops diplay function at 60 fps
-	glutDisplayFunc(display);	//registers "display" as the display callback function
-	glutReshapeFunc(reshape);
-	glutKeyboardFunc(keyboard);
-	glutSpecialFunc(special);
-	glutMouseFunc(mouse);
-	glutPassiveMotionFunc(passive); 
+	glutCallbacks();
 
     /* TEXTURES */
 	glEnable(GL_TEXTURE_2D);
