@@ -22,9 +22,13 @@ using namespace std;
 
 #define ShowUpvector
 
+int terrainSizeX = 10;
+int terrainSizeZ = 10;
+terrain mazeTerrain(terrainSizeX, terrainSizeZ, 5);
+
 //minimap globals:
 int win_minimap;
-int wallSize = 20;		//size of a 2D wall
+int wallSize;			//size of a 2D wall
 int dotSize = 5;		//size of the player's (camera's) dot.
 
 CCamera Camera;
@@ -32,9 +36,6 @@ CCamera Camera;
 int windowWidth = 600;
 int windowHeight = 600;
 
-int terrainSizeX = 10;
-int terrainSizeZ = 10;
-terrain mazeTerrain(terrainSizeX, terrainSizeZ, 5);
 
 float upVect[] = {0,1,0};
 float camPos[] = {50,0,50};
@@ -341,12 +342,12 @@ void display_main(void) {
 
 void display_minimap(){
 	glClear(GL_COLOR_BUFFER_BIT);
-	glPointSize(wallSize);
+	glPointSize(200/terrainSizeX);
 	glBegin(GL_POINTS);
 	//loop will draw all pixels on the map
 	for (int x=0; x < terrainSizeX; x++){
 		for (int z=0; z < terrainSizeZ; z++){
-			if (mazeTerrain.mazeHeightMap[x][z] != 0){	//if not 0 (wakable path), draw a wall
+			if (mazeTerrain.mazeHeightMap[z][x] != 0){	//if not 0 (wakable path), draw a wall
 			glColor3f(1.0f, 1.0f, 1.0f);
 			glVertex2f(x+0.5, z+0.5);
 			}
