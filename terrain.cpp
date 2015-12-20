@@ -383,7 +383,7 @@ void terrain::startDFS(int x, int z){
 void terrain::showMaze() {
     for (int z = 0; z < sizeZ; ++z) {
         for (int x = 0; x < sizeX; ++x) {
-			printf("%d\t", mazeHeightMap[x][z]);
+			printf("%d ", mazeHeightMap[x][z]);
 		}
 		printf("\n");
 	}

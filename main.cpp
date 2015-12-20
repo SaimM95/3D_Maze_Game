@@ -434,7 +434,9 @@ int main(int argc, char** argv) {
 
 	// initialize random seed
 	/* srand((0)); */
-    srand(time(NULL));
+	int seed = time(NULL);
+    srand(seed);
+    printf("Current Seed: %d\n", seed);
 
 
 	mazeTerrain.load(&Camera);
