@@ -13,4 +13,3 @@ Description:
 
 Slack integration test
 
-

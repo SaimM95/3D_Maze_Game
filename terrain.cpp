@@ -16,8 +16,12 @@
 
 using namespace std;
 
+
 // Constructor
 terrain::terrain(int sizeX, int sizeZ, int height) {
+    /* sizeX = (sizeX%2==0)? (sizeX+1):(sizeX); */
+    /* sizeZ = (sizeZ%2==0)? (sizeZ+1):(sizeZ); */
+
 	this->sizeX = sizeX;
 	this->sizeZ = sizeZ;
 	this->height = height;
@@ -27,7 +31,7 @@ terrain::terrain(int sizeX, int sizeZ, int height) {
 	faceNormals = new vector<vertex3D>(faces->size());
 	vertexNormals = new vector<vertex3D>(verts->size());
 
-	// mazeHeightMap is a 2d representation of the maze where each element's value is either 0 (walkable path) 
+	// mazeHeightMap is a 2d representation of the maze where each element's value is either 0 (walkable path)
 	// or height (wall)
 	// NOTE THE ORDER OF sizeX,sizeZ (i.e. (x,z)) in array - positive x-axis points DOWN, positive z-axis points LEFT
 	mazeHeightMap = new int*[sizeX];
@@ -43,10 +47,9 @@ terrain::terrain(int sizeX, int sizeZ, int height) {
 }
 
 // Load the maze terrain
-void terrain::load() {
-	generateMaze();
+void terrain::load(CCamera * cam) {
+	generateMaze(cam);
 	showMaze();
-
 	// Use maze2d.mazeHeightMap[][] for height (y-coords) of each vertex
 	// ...
 	// Populate verts, faces, faceNormals and vertexNormals arrays
@@ -55,8 +58,11 @@ void terrain::load() {
 	// Set x, y, z values for all the vertices in such a way that it translates into a flat plane of points
 	// i.e. all points have height 0
 	int vertexCount = 0;
+	/* for (int x = (-sizeX/2)*10; x <= (sizeX/2)*10; x+=10) { */
+	/* 	for (int z = (sizeZ/2)*10; z >= (-sizeZ/2)*10; z-=10) { */
 	for (int x = (-sizeX/2)*10; x <= (sizeX/2)*10; x+=10) {
 		for (int z = (sizeZ/2)*10; z >= (-sizeZ/2)*10; z-=10) {
+
 			verts->at(vertexCount).set(x,0,z);
 			vertexCount++;
 		}
@@ -68,10 +74,10 @@ void terrain::load() {
 	// 	}
 	// }
 
-	// Fill the faces vector with vertices in a sequential manner 
+	// Fill the faces vector with vertices in a sequential manner
 	// (i.e. each 4 vertices that should appear together, correspond to a single polygon)
 	int xCount = 0;
-	int heightX = 0; 
+	int heightX = 0;
 	int heightZ = 0;
 	for (int f = 0; f < faces->size(); ++f) {
 		if (f > 0 && f%sizeX == 0) xCount++;
@@ -87,19 +93,13 @@ void terrain::load() {
 		verts->at(v3).addFace(f);
 		verts->at(v4).addFace(f);
 
-		// printf("heightX:%d heightZ:%d Height:%d\n", heightX, heightZ, mazeHeightMap[heightX][heightZ]);
-
-		// verts->at(v1).y = mazeHeightMap[heightX][heightZ];
-		// verts->at(v2).y = mazeHeightMap[heightX][heightZ];
-		// verts->at(v3).y = mazeHeightMap[heightX][heightZ];
-		// verts->at(v4).y = mazeHeightMap[heightX][heightZ];
-
 		heightZ++;
 		if (heightZ >= sizeZ) {
 			heightX++;
 			heightZ = 0;
 		}
 	}
+
 
 	calcFaceNormals();
 	calcVertexNormals();
@@ -112,7 +112,7 @@ void terrain::load() {
 // Draw the terrain using glut functions
 void terrain::draw() {
 	int xCount = 0;
-	int heightX = 0; 
+	int heightX = 0;
 	int heightZ = 0;
 
 	int extrudeVal = 0;
@@ -133,14 +133,14 @@ void terrain::draw() {
 			drawWall(v3,v4);
 			drawWall(v4,v1);
 
-			
+
 		}
 		else {
 			extrudeVal = 0;
 		}
 
 		glColor3f(0.8,0.8,0.8);
-	
+
 		glBegin(GL_POLYGON);
 			glNormal3f(vertexNormals->at(v1).x, vertexNormals->at(v1).y, vertexNormals->at(v1).z);
 			glVertex3f(faces->at(i).v1.x, faces->at(i).v1.y + extrudeVal, faces->at(i).v1.z);
@@ -164,15 +164,15 @@ void terrain::draw() {
 }
 
 bool terrain::checkCollision(float xPos, float zPos) {
-	int heightX = 0; 
+	int heightX = 0;
 	int heightZ = 0;
 
 	for (int i = 0; i < faces->size(); ++i) {
-		if (xPos >= faces->at(i).v3.x && 
-			xPos <= faces->at(i).v1.x && 
-			zPos >= faces->at(i).v3.z && 
+		if (xPos >= faces->at(i).v3.x &&
+			xPos <= faces->at(i).v1.x &&
+			zPos >= faces->at(i).v3.z &&
 			zPos <= faces->at(i).v1.z) {
-			// printf("FaceXLow:%f FaceXHigh:%f FaceZLow:%f FaceZHigh:%f X:%d Z:%d -- On face:%d\n", 
+			// printf("FaceXLow:%f FaceXHigh:%f FaceZLow:%f FaceZHigh:%f X:%d Z:%d -- On face:%d\n",
 			// 	faces->at(i).v3.x, faces->at(i).v1.x, faces->at(i).v3.z, faces->at(i).v1.z, xPos, zPos, i);
 			if (mazeHeightMap[heightX][heightZ] < height) return false;
 		}
@@ -182,7 +182,7 @@ bool terrain::checkCollision(float xPos, float zPos) {
 			heightX++;
 			heightZ = 0;
 		}
-	// 	// else printf("COLLISSION! FaceXLow:%f FaceXHigh:%f FaceZLow:%f FaceZHigh:%f X:%d Z:%d \n", 
+	// 	// else printf("COLLISSION! FaceXLow:%f FaceXHigh:%f FaceZLow:%f FaceZHigh:%f X:%d Z:%d \n",
 	// 	// 	faces->at(i).v3.x, faces->at(i).v1.x, faces->at(i).v1.z, faces->at(i).v3.z, xPos, zPos);
 	}
 
@@ -194,68 +194,196 @@ bool terrain::checkCollision(float xPos, float zPos) {
 	// 	if ((i+1)%11 == 0) printf("\n");
 	// }
 
-	// printf("COLLISSION! FaceXLow:%f FaceXHigh:%f FaceZLow:%f FaceZHigh:%f X:%d Z:%d \n", 
+	// printf("COLLISSION! FaceXLow:%f FaceXHigh:%f FaceZLow:%f FaceZHigh:%f X:%d Z:%d \n",
 	// 		faces->at(10).v3.x, faces->at(10).v1.x, faces->at(10).v1.z, faces->at(10).v3.z, xPos, zPos);
 }
 
 // Private function: Populate mazeHeightMap array
-void terrain::generateMaze() {
-	// Put walls on all the edges of the terrain
-	for (int x = 0; x < sizeX; ++x) {
-		for (int z = 0; z < sizeZ; ++z) {
-			if (x == 0 || z == 0 || x == sizeX-1 || z == sizeZ-1)
-				mazeHeightMap[x][z] = height;
-		}
-	}
+/* void generateMaze2() { */
+	/* // Put walls on all the edges of the terrain */
+	/* for (int x = 0; x < sizeX; ++x) { */
+	/* 	for (int z = 0; z < sizeZ; ++z) { */
+	/* 		if (x == 0 || z == 0 || x == sizeX-1 || z == sizeZ-1) */
+	/* 			mazeHeightMap[x][z] = height; */
+	/* 	} */
+	/* } */
 
-	// mazeHeightMap[10][10] = {
-	// 				{5,5,5,5,5,5,5,5,5,5},
-	// 			s->	{0,0,5,0,5,0,0,0,0,5},
-	// 				{5,0,5,0,5,0,5,0,5,5},
-	// 				{5,0,5,0,5,0,5,0,5,5},
-	// 				{5,0,5,0,5,0,0,0,0,5},
-	// 				{5,0,5,0,5,0,5,5,0,5},
-	// 				{5,0,0,0,5,0,5,0,0,5},
-	// 				{5,0,5,0,5,0,5,0,5,5},
-	// 				{5,0,5,0,0,0,5,0,0,0}, <- f
-	// 				{5,5,5,5,5,5,5,5,5,5}
-	// 			};
+	/* // mazeHeightMap[10][10] = { */
+	/* // 				{5,5,5,5,5,5,5,5,5,5}, */
+	/* // 			s->	{0,0,5,0,5,0,0,0,0,5}, */
+	/* // 				{5,0,5,0,5,0,5,0,5,5}, */
+	/* // 				{5,0,5,0,5,0,5,0,5,5}, */
+	/* // 				{5,0,5,0,5,0,0,0,0,5}, */
+	/* // 				{5,0,5,0,5,0,5,5,0,5}, */
+	/* // 				{5,0,0,0,5,0,5,0,0,5}, */
+	/* // 				{5,0,5,0,5,0,5,0,5,5}, */
+	/* // 				{5,0,5,0,0,0,5,0,0,0}, <- f */
+	/* // 				{5,5,5,5,5,5,5,5,5,5} */
+	/* // 			}; */
 
-	// Generate maze walls
-	// ...
-	mazeHeightMap[1][0] = 0;
-	mazeHeightMap[1][2] = 5;
-	mazeHeightMap[2][2] = 5;
-	mazeHeightMap[3][2] = 5;
-	mazeHeightMap[4][2] = 5;
-	mazeHeightMap[5][2] = 5;
-	mazeHeightMap[7][2] = 5;
-	mazeHeightMap[8][2] = 5;
-	mazeHeightMap[1][4] = 5;
-	mazeHeightMap[2][4] = 5;
-	mazeHeightMap[3][4] = 5;
-	mazeHeightMap[4][4] = 5;
-	mazeHeightMap[5][4] = 5;
-	mazeHeightMap[6][4] = 5;
-	mazeHeightMap[7][4] = 5;
-	mazeHeightMap[2][6] = 5;
-	mazeHeightMap[3][6] = 5;
-	mazeHeightMap[5][6] = 5;
-	mazeHeightMap[6][6] = 5;
-	mazeHeightMap[7][6] = 5;
-	mazeHeightMap[8][6] = 5;
-	mazeHeightMap[5][7] = 5;
-	mazeHeightMap[2][8] = 5;
-	mazeHeightMap[3][8] = 5;
-	mazeHeightMap[7][8] = 5;
-	mazeHeightMap[8][9] = 0;
+	/* // Generate maze walls */
+	/* // ... */
+	/* mazeHeightMap[1][0] = 0; */
+	/* mazeHeightMap[1][2] = 5; */
+	/* mazeHeightMap[2][2] = 5; */
+	/* mazeHeightMap[3][2] = 5; */
+	/* mazeHeightMap[4][2] = 5; */
+	/* mazeHeightMap[5][2] = 5; */
+	/* mazeHeightMap[7][2] = 5; */
+	/* mazeHeightMap[8][2] = 5; */
+	/* mazeHeightMap[1][4] = 5; */
+	/* mazeHeightMap[2][4] = 5; */
+	/* mazeHeightMap[3][4] = 5; */
+	/* mazeHeightMap[4][4] = 5; */
+	/* mazeHeightMap[5][4] = 5; */
+	/* mazeHeightMap[6][4] = 5; */
+	/* mazeHeightMap[7][4] = 5; */
+	/* mazeHeightMap[2][6] = 5; */
+	/* mazeHeightMap[3][6] = 5; */
+	/* mazeHeightMap[5][6] = 5; */
+	/* mazeHeightMap[6][6] = 5; */
+	/* mazeHeightMap[7][6] = 5; */
+	/* mazeHeightMap[8][6] = 5; */
+	/* mazeHeightMap[5][7] = 5; */
+	/* mazeHeightMap[2][8] = 5; */
+	/* mazeHeightMap[3][8] = 5; */
+	/* mazeHeightMap[7][8] = 5; */
+	/* mazeHeightMap[8][9] = 0; */
+/* } */
+void terrain::generateMaze(CCamera *cam){
+  // make everything equal to -1
+  for (int x = 0; x < sizeX; ++x) {
+    for (int z = 0; z < sizeZ; ++z) {
+      mazeHeightMap[x][z] = 5;
+    }
+  }
+
+  //base as in the lowest value that has passed recursion
+  int base = 11;
+  // make all the boundries along the x aixs
+  for(int i = 0; i < sizeX; i++){
+    mazeHeightMap[i][0]       = 16;
+    mazeHeightMap[i][sizeZ-1] = 16;
+  }
+  // make all the boundries along the y axis
+  for(int i = 0; i < sizeZ; i++){
+    mazeHeightMap[0][i]       = 16;
+    mazeHeightMap[sizeX-1][i] = 16;
+  }
+
+  //start adding walls
+  int startX, startZ;
+  if(rand()%2 > 0){
+    startX = (rand()%(sizeX/2)) * 2 + 1;
+    startZ = (rand()%2 > 0)? 0:sizeZ-1;
+  }else{
+    startX = (rand()%2 > 0)? 0:sizeX-1;
+    startZ = (rand()%(sizeZ/2)) * 2 + 1;
+  }
+  mazeHeightMap[startX][startZ] = 11;
+  /* showMaze(); */
+  float* camPos = convertHeightMapToFace(startX, startZ);
+  cam->setPosition(camPos[0], 1, camPos[2]);
+
+  /* printf("cameraPosition:(%f,%f,%f)\n", cam->Position.x, cam->Position.y, cam->Position.z); */
+
+  // starting the DFS
+  int xStep = startX, zStep = startZ;
+  if(xStep == 0 || xStep == sizeX-1)      xStep += 1 - 2*(xStep)/(sizeX-1);
+  else if(zStep == 0 || zStep == sizeZ-1) zStep += 1 - 2*(zStep)/(sizeZ-1);
+  mazeHeightMap[xStep][zStep] = 11;
+  startDFS(xStep, zStep);
+
+  //make the exit
+  int endX = 0, endZ = 0;
+  if(rand()%2 > 0){
+    endX = (rand()%(sizeX/2)) * 2 + 1;//rand()%(sizeX-2)+1;
+    endZ = (rand()%2 > 0)? 0:sizeZ-1;
+  }else{
+    endX = (rand()%2 > 0)? 0:sizeX-1;
+    endZ = (rand()%(sizeZ/2)) * 2 + 1;//rand()%(sizeZ-2)+1;
+  }
+  /* printf("endX:%i, endZ:%i\n",endX,endZ); */
+  mazeHeightMap[endX][endZ] = 11;
+
+  if(endX == sizeX-1 || endZ == sizeZ-1){
+    xStep = endX, zStep = endZ;
+    if(xStep == 0 || xStep == sizeX-1)      xStep += 1 - 2*(xStep)/(sizeX-1);
+    else if(zStep == 0 || zStep == sizeZ-1) zStep += 1 - 2*(zStep)/(sizeZ-1);
+    mazeHeightMap[xStep][zStep] = 11;
+  }
+  /* showMaze(); */
+
+
+  // make all the numbers normal, from 0 or 5
+  for (int i = 0; i < sizeX; i++) {
+    for (int j = 0; j < sizeZ; j++){
+      if(mazeHeightMap[i][j]==-1) mazeHeightMap[i][j] = 0;
+      else if(mazeHeightMap[i][j] >= 10) mazeHeightMap[i][j] = mazeHeightMap[i][j]-11; // so then -1 = 10, 0 = 11, 12 = 1
+    }
+  }
+
+  /* printf("done the start making terrain function\n"); */
+
+}
+void terrain::startDFS(int x, int z){
+  mazeHeightMap[x][z] = 11;
+  /* showMaze(); */
+  // all the possible values
+    // x+1 , z   = right
+    // x+1 , z+1
+    // x   , z+1 = down
+    // x-1 , z+1
+    // x-1 , z   = left
+    // x-1 , z-1
+    // x   , z-1 = top
+    // x+1 , z-1
+  // end of all the possible values
+  /* int possibleX[] = {x+1 , x   , x-1 , x   }; */
+  /* int possibleZ[] = {z   , z+1 , z   , z-1 }; */
+  int possibleX[] = {x+2 , x   , x-2 , x   };
+  int possibleZ[] = {z   , z+2 , z   , z-2 };
+
+  // make a loop that goes through all of em
+  int numberOfPlaces = 0;
+  for(int i = 0; i < sizeof(possibleX)/sizeof(possibleX[0]); i++){
+    int curX = possibleX[i];
+    int curZ = possibleZ[i];
+    if(curX >= sizeX-1 || curZ >= sizeZ-1 || curX <= 0 || curZ <= 0) continue;
+    if(mazeHeightMap[curX][curZ] >= 10) continue;
+    numberOfPlaces++;
+  }
+
+  if(numberOfPlaces == 0) return;
+  int chosenPath = rand()%numberOfPlaces;
+  numberOfPlaces = 0;
+  for(int i = 0; i< sizeof(possibleX)/sizeof(possibleX[0]); i++){
+    int curX = possibleX[i];
+    int curZ = possibleZ[i];
+    if(curX >= sizeX-1 || curZ >= sizeZ-1 || curX <= 0 || curZ <= 0) continue;
+    if(mazeHeightMap[curX][curZ] >= 10) continue;
+    if(chosenPath == numberOfPlaces){
+      //chose this path
+      int dirX = curX-x;//x-curX;
+      dirX = (dirX!=0)? abs(dirX)/dirX:0;
+      int dirZ = curZ-z;//z-curZ;
+      dirZ = (dirZ!=0)? abs(dirZ)/dirZ:0;
+      mazeHeightMap[x+dirX     ][z+dirZ     ] = 11;
+      startDFS(curX,curZ);
+      startDFS(x,z);
+      return;
+    }
+    numberOfPlaces++;
+  }
+
+  //end of function
 }
 
 // Private function: Print out the mazeHeightMap array
 void terrain::showMaze() {
-	for (int x = 0; x < sizeX; ++x) {
-		for (int z = 0; z < sizeZ; ++z) {
-			printf("%d ", mazeHeightMap[x][z]);
+    for (int z = 0; z < sizeZ; ++z) {
+        for (int x = 0; x < sizeX; ++x) {
+			printf("%d\t", mazeHeightMap[x][z]);
 		}
 		printf("\n");
 	}
@@ -265,10 +393,10 @@ void terrain::showMaze() {
 void terrain::calcFaceNormals() {
 	float normalLength;
 	for (int i = 0; i < faceNormals->size(); ++i) {
-		float v1[] = {faces->at(i).v2.x - faces->at(i).v1.x, faces->at(i).v2.y - faces->at(i).v1.y, 
+		float v1[] = {faces->at(i).v2.x - faces->at(i).v1.x, faces->at(i).v2.y - faces->at(i).v1.y,
 					faces->at(i).v2.z - faces->at(i).v1.z};
 
-		float v2[] = {faces->at(i).v4.x - faces->at(i).v1.x, faces->at(i).v4.y - faces->at(i).v1.y, 
+		float v2[] = {faces->at(i).v4.x - faces->at(i).v1.x, faces->at(i).v4.y - faces->at(i).v1.y,
 			faces->at(i).v4.z - faces->at(i).v1.z};
 
 		// Cross Product
@@ -302,7 +430,7 @@ void terrain::calcVertexNormals() {
 				aveZ += faceNormals->at(verts->at(i).faces[0]).z;
 			}
 		}
-		
+
 		aveX /= verts->at(i).numFaces;
 		aveY /= verts->at(i).numFaces;
 		aveZ /= verts->at(i).numFaces;
@@ -336,3 +464,4 @@ float* terrain::convertHeightMapToFace(int i, int j) {
 
 	return centerPoint;
 }
+

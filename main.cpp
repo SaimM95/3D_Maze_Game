@@ -211,6 +211,7 @@ bool Intersect(int x, int y){
 
 	printf("near point: %f,%f,%f\n", start[0], start[1], start[2]);
 	printf("far point: %f,%f,%f\n", endL[0], endL[1], endL[2]);
+<<<<<<< HEAD
 
 	//check for intersection against sphere!
 	//hurray!
@@ -266,6 +267,8 @@ bool Intersect(int x, int y){
 
 
 	return false; //else returns false
+=======
+>>>>>>> 9c24907b9c4cec5558ebe2808e0464c95dd59073
 }
 
 void display_main(void) {
@@ -275,14 +278,18 @@ void display_main(void) {
 
 	Camera.Render();
 
+<<<<<<< HEAD
 	// gluLookAt(	Camera.Position.x,Camera.Position.y,Camera.Position.z,
 	// 			Camera.ViewDir.x + Camera.Position.x,Camera.ViewDir.y + Camera.Position.y,Camera.ViewDir.z + Camera.Position.z,
 	// 			Camera.UpVector.x,Camera.UpVector.y,Camera.UpVector.z);
 
 	// Camera.showPosition();
 	// Camera.showViewPoint();
+=======
+	// moveCamWithMouse();
+>>>>>>> 9c24907b9c4cec5558ebe2808e0464c95dd59073
 
-	// gluLookAt(camPos[0], camPos[1], camPos[2], camFocus[0],camFocus[1],camFocus[2], upVect[0],upVect[1],upVect[2]);
+	Camera.MoveWithMouse(mouseX);
 
 	glColor3f(1,1,1); // White light color
 	glEnable(GL_LIGHT0);
@@ -370,13 +377,6 @@ void display_minimap(){
 }
 
 void special(int key, int x, int y) {
-	// int fx = camFocus[0];
-	// int fz = camFocus[2];
-	// int px = camPos[0];
-	// int pz = camPos[2];
-	// float slope = (fz - pz) / (fx - px);
-	// float b = fz - (slope*fx);
-
 	switch(key) {
 		case GLUT_KEY_UP:
 			// "Pretend" to move forward
@@ -456,12 +456,19 @@ void keyboard(unsigned char key, int x, int y) {
 			display_main();
 			break;
 		case 'd':
+<<<<<<< HEAD
 			Camera.RotateY(-1.0);
 			display_main();
 			break;
 		case 'a':
 			Camera.RotateY(1.0);
 			display_main();
+=======
+			Camera.StrafeRight(0.3);
+			break;
+		case 'a':
+			Camera.StrafeRight(-0.3);
+>>>>>>> 9c24907b9c4cec5558ebe2808e0464c95dd59073
 			break;
 		case ' ':
 			// Intersect(int(Camera.ViewDir.x), int(Camera.ViewDir.z));
@@ -476,12 +483,23 @@ void keyboard(unsigned char key, int x, int y) {
 
 void mouse(int button, int state, int x, int y){
 	if(button ==  GLUT_LEFT_BUTTON && state == GLUT_DOWN){
+<<<<<<< HEAD
 		if (Intersect(x,y)) {
 			sphereAlive = false;
 			printf("Sphere is dead\n");
 			display_main();
 		}
 	}
+=======
+		Intersect(x,y);
+		// glutPostRedisplay();
+	}
+}
+
+void passive(int x, int y) {
+	mouseX = x;
+	glutPostRedisplay();
+>>>>>>> 9c24907b9c4cec5558ebe2808e0464c95dd59073
 }
 
 void init(void) {
@@ -496,8 +514,6 @@ void init(void) {
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	//glOrtho(-2, 2, -2, 2, -2, 2);
-	// gluPerspective(45, 1, 1, 400);
 
 	//enable backface culling
     glFrontFace(GL_CCW);
@@ -518,8 +534,6 @@ void reshape(int x, int y) {
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	//Angle of view:40 degrees
-	//Near clipping plane distance: 0.5
-	//Far clipping plane distance: 20.0
 	gluPerspective(40.0,(GLdouble)x/(GLdouble)y,0.5,400.0);
 
 	glMatrixMode(GL_MODELVIEW);
@@ -553,16 +567,29 @@ int main(int argc, char** argv) {
 	glutInitWindowSize(600, 600);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
 	glutCreateWindow("3D Maze Game");	//creates the window
+	glutWarpPointer(300, 300);			// move cursor to middle of window
 
 	// initialize random seed
-	srand((0));
+	/* srand((0)); */
+    srand(time(NULL));
 
-	mazeTerrain.load();
 
+	mazeTerrain.load(&Camera);
+    /* Camera.setPosition(0,0,6); */
 	Camera.Move( F3dVector(-31.0, playerHeight, 35.0 ));
 	Camera.MoveForward( 1.0 );
 
+<<<<<<< HEAD
 	glutCallbacks();
+=======
+	// glutIdleFunc(display);		// Loops diplay function at 60 fps
+	glutDisplayFunc(display);	//registers "display" as the display callback function
+	glutReshapeFunc(reshape);
+	glutKeyboardFunc(keyboard);
+	glutSpecialFunc(special);
+	glutMouseFunc(mouse);
+	glutPassiveMotionFunc(passive); 
+>>>>>>> 9c24907b9c4cec5558ebe2808e0464c95dd59073
 
     /* TEXTURES */
 	glEnable(GL_TEXTURE_2D);
