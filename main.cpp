@@ -463,7 +463,7 @@ void glutCallbacks(){
 	glutKeyboardFunc(keyboard);
 	glutSpecialFunc(special);
 	glutMouseFunc(mouse);
-	glutPassiveMotionFunc(passive); 
+	glutPassiveMotionFunc(passive);
 }
 
 int main(int argc, char** argv) {
@@ -489,7 +489,7 @@ int main(int argc, char** argv) {
 
 	// initialize random seed
 	/* srand((0)); */
-	int seed = time(NULL);
+	int seed = 1450643708; //time(NULL);
     srand(seed);
     printf("Current Seed: %d\n", seed);
 

@@ -274,18 +274,18 @@ void terrain::generateMaze(CCamera *cam){
   //start adding walls
   int startX, startZ;
   if(rand()%2 > 0){
-    startX = (rand()%(sizeX/2)) * 2 + 1;
+    startX = (rand()%(sizeX/2-1)) * 2 + 1;
     startZ = (rand()%2 > 0)? 0:sizeZ-1;
   }else{
     startX = (rand()%2 > 0)? 0:sizeX-1;
-    startZ = (rand()%(sizeZ/2)) * 2 + 1;
+    startZ = (rand()%(sizeZ/2-1)) * 2 + 1;
   }
   mazeHeightMap[startX][startZ] = 11;
   /* showMaze(); */
   float* camPos = convertHeightMapToFace(startX, startZ);
   cam->setPosition(camPos[0], 1, camPos[2]);
-
-  /* printf("cameraPosition:(%f,%f,%f)\n", cam->Position.x, cam->Position.y, cam->Position.z); */
+  printf("startX:%i, startZ:%i\n",startX, startZ);
+  printf("cameraPosition:(%f,%f,%f)\n", cam->Position.x, cam->Position.y, cam->Position.z);
 
   // starting the DFS
   int xStep = startX, zStep = startZ;
@@ -297,14 +297,15 @@ void terrain::generateMaze(CCamera *cam){
   //make the exit
   int endX = 0, endZ = 0;
   if(rand()%2 > 0){
-    endX = (rand()%(sizeX/2)) * 2 + 1;//rand()%(sizeX-2)+1;
+    endX = (rand()%(sizeX/2-1)) * 2 + 1;//rand()%(sizeX-2)+1;
     endZ = (rand()%2 > 0)? 0:sizeZ-1;
   }else{
     endX = (rand()%2 > 0)? 0:sizeX-1;
-    endZ = (rand()%(sizeZ/2)) * 2 + 1;//rand()%(sizeZ-2)+1;
+    endZ = (rand()%(sizeZ/2-1)) * 2 + 1;//rand()%(sizeZ-2)+1;
   }
   /* printf("endX:%i, endZ:%i\n",endX,endZ); */
   mazeHeightMap[endX][endZ] = 11;
+  printf("endX:%i, endZ:%i\n",endX, endZ);
 
   if(endX == sizeX-1 || endZ == sizeZ-1){
     xStep = endX, zStep = endZ;
@@ -324,7 +325,6 @@ void terrain::generateMaze(CCamera *cam){
   }
 
   /* printf("done the start making terrain function\n"); */
-
 }
 void terrain::startDFS(int x, int z){
   mazeHeightMap[x][z] = 11;
@@ -381,8 +381,8 @@ void terrain::startDFS(int x, int z){
 
 // Private function: Print out the mazeHeightMap array
 void terrain::showMaze() {
-    for (int z = 0; z < sizeZ; ++z) {
-        for (int x = 0; x < sizeX; ++x) {
+    for (int x = 0; x < sizeX; ++x) {
+        for (int z = 0; z < sizeZ; ++z) {
 			printf("%d ", mazeHeightMap[x][z]);
 		}
 		printf("\n");
