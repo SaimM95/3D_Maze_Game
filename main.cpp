@@ -62,6 +62,8 @@ double start[] = {0,0,0}, endL[] = {1,1,1};
 
 bool sphereAlive = true;
 
+int mouseX = 0;
+
 /* TEXTURE */
 GLubyte *img_data;
 int width, height, maximum;
