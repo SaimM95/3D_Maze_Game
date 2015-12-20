@@ -65,6 +65,7 @@ void terrain::load(CCamera * cam) {
 	/* 	for (int z = (sizeZ/2)*10; z >= (-sizeZ/2)*10; z-=10) { */
 	for (int x = (-sizeX/2)*10; x < (sizeX/2)*10; x+=10) {
 		for (int z = (sizeZ/2 - 1)*10; z >= (-sizeZ/2)*10; z-=10) {
+
 			verts->at(vertexCount).set(x,0,z);
 			vertexCount++;
 		}
@@ -109,6 +110,14 @@ void terrain::load(CCamera * cam) {
 			heightZ = 0;
 		}
 	}
+
+
+    /* faces3D curFace = faces->at(startX*sizeX + startZ); */
+    /* faces3D curFace = faces->at(0*sizeX + 1); */
+    faces3D curFace = faces->at(1*sizeX + 1);
+    printf("curFace v1:(%f,%f,%f)  v2:(%f,%f,%f)  v3:(%f,%f,%f)  v4:(%f,%f,%f)\n", curFace.v1.x, curFace.v1.y, curFace.v1.z, curFace.v2.x, curFace.v2.y, curFace.v2.z, curFace.v3.x, curFace.v3.y, curFace.v3.z, curFace.v4.x, curFace.v4.y, curFace.v4.z);
+    cam->setPosition((curFace.v1.x + curFace.v3.x)/2, 0, (curFace.v1.z+curFace.v3.z)/2);
+    printf("cameraPosition:(%f,%f,%f)\n", cam->Position.x, cam->Position.y, cam->Position.z);
 
     printf("going inside the calcFacenormals\n");
 	calcFaceNormals();
@@ -290,7 +299,10 @@ void terrain::generateMaze(CCamera *cam){
   printf("startX:%i, startZ:%i\n",startX,startZ);
   mazeHeightMap[startX][startZ] = 11;
   showMaze();
-  cam->setPosition(startX*10-(sizeX/2)*10 + 5, 0, startZ*10-(sizeZ/2)*10 + 5);
+  /* cam->setPosition(startX*10-(sizeX/2)*10 + 5, 0, startZ*10-(sizeZ/2)*10 + 5); */
+  /* cam->setPosition(startZ*10-(sizeZ/2)*10 + 5, 0, startX*10-(sizeX/2)*10 + 5); */
+
+
   /* cam->setPosition(0,5,0); */
   printf("cameraPosition:(%f,%f,%f)\n", cam->Position.x, cam->Position.y, cam->Position.z);
 
