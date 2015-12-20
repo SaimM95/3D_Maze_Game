@@ -301,6 +301,8 @@ void terrain::generateMaze(CCamera *cam){
   showMaze();
   /* cam->setPosition(startX*10-(sizeX/2)*10 + 5, 0, startZ*10-(sizeZ/2)*10 + 5); */
   /* cam->setPosition(startZ*10-(sizeZ/2)*10 + 5, 0, startX*10-(sizeX/2)*10 + 5); */
+  float* camPos = convertHeightMapToFace(startX, startZ);
+  cam->setPosition(camPos[0], camPos[1], camPos[2]);
 
 
   /* cam->setPosition(0,5,0); */
@@ -477,4 +479,17 @@ void terrain::drawWall(int v1, int v2) {
 		glTexCoord2f(1, 1);
 		glVertex3f(verts->at(v1).x, verts->at(v1).y + height, verts->at(v1).z);
 	glEnd();
+}
+
+
+float* terrain::convertHeightMapToFace(int i, int j) {
+	int faceIndex = (i*sizeX) + j;
+	float centerPoint[] = {0,0,0};
+
+	centerPoint[0] = (faces->at(faceIndex).v3.x + faces->at(faceIndex).v1.x) / 2;
+	centerPoint[2] = (faces->at(faceIndex).v3.z + faces->at(faceIndex).v1.z) / 2;
+
+	centerPoint[1] = mazeHeightMap[i][j];
+
+	return centerPoint;
 }

@@ -96,6 +96,7 @@ private:
 	vector<vertex3D>*vertexNormals;
 
 	void generateMaze(CCamera *cam);
+    float* convertHeightMapToFace(int i, int j);
 	void showMaze();
 	void calcFaceNormals();
 	void calcVertexNormals();
