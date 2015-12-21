@@ -26,6 +26,7 @@ terrain::terrain(int sizeX, int sizeZ, int height) {
 	this->sizeX = sizeX;
 	this->sizeZ = sizeZ;
 	this->height = height;
+    endPos = new SF3dVector();
 
 	verts = new vector<vertex3D>((sizeX+1)*(sizeZ+1));
 	faces = new vector<faces3D>(sizeX*sizeZ);
@@ -64,7 +65,6 @@ void terrain::load(CCamera * cam) {
 	/* 	for (int z = (sizeZ/2)*10; z >= (-sizeZ/2)*10; z-=10) { */
 	for (int x = (-sizeX/2)*10; x <= (sizeX/2)*10; x+=10) {
 		for (int z = (sizeZ/2)*10; z >= (-sizeZ/2)*10; z-=10) {
-
 			verts->at(vertexCount).set(x,0,z);
 			vertexCount++;
 		}
@@ -107,8 +107,17 @@ void terrain::load(CCamera * cam) {
 
     printf("startX:%i, startZ:%i\n",startX, startZ);
     float camPosX, camPosZ;
-    convertHeightMapToFace2(7, 9, &camPosX, &camPosZ);
+    convertHeightMapToFace2(startX, startZ, &camPosX, &camPosZ);
     cam->setPosition(camPosX, 2, camPosZ);
+    endPos->x = endX;
+    endPos->y = 1;
+    endPos->z = endZ;
+    printf("endPos:(%f,%f,%f), startPos:(%i,%i,%i)\n",endPos->x, endPos->y, endPos->z , startX, 1, startZ);
+    float a, b, c, d;
+    convertHeightMapToFace2(endPos->x, endPos->z, &a,&b);
+    convertHeightMapToFace2(startX, startZ, &c,&d);
+    printf("after positions end:(%f,%f)   start:(%f,%f)\n",a,b,c,d);
+    /* cam->setPosition(-45,1,-45); */
     printf("cameraPosition:(%f,%f,%f)\n", cam->Position.x, cam->Position.y, cam->Position.z);
 
 
@@ -436,7 +445,16 @@ SF3dVector convertToGridPos(SF3dVector pos){
 }
 
 bool terrain::reachedEnd(CCamera *cam){
-    SF3dVector gridVec =  convertToGridPos(cam->Position);
-    return (gridVec.x ==  endPos->x && gridVec.y ==  endPos->y && gridVec.z ==  endPos->z);
+    /* SF3dVector gridVec =  convertToGridPos(cam->Position); */
+    /* return (gridVec.x ==  endPos->x && gridVec.y ==  endPos->y && gridVec.z ==  endPos->z); */
+    float x, z;
+    convertHeightMapToFace2(endPos->x, endPos->z, &x,&z);
+
+    /* float dist = cam->Position.x*cam->Position.x + cam->Position.y * cam->Position.y + cam->Position.z * cam->Position.z; */
+    float dist = pow(cam->Position.x - x, 2) + pow(cam->Position.z - z , 2);
+    dist = sqrt(dist);
+    /* printf("dist:%f endPos:(%f,%f,%f), x:%f, z:%f, camPos:(%f,%f,%f)\n", dist, endPos->x, endPos->y, endPos->z, x,z,cam->Position.x, cam->Position.y, cam->Position.z); */
+    return (dist < 10);
+
 }
 

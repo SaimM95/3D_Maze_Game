@@ -216,17 +216,24 @@ void Intersect(int x, int y){
 	printf("far point: %f,%f,%f\n", endL[0], endL[1], endL[2]);
 }
 
+
+void restartMaze(){
+    delete mazeTerrain;
+    terrainSizeX += 10;
+    terrainSizeZ += 10;
+    mazeTerrain = new terrain(terrainSizeX, terrainSizeZ, 5);
+    mazeTerrain->load(&Camera);
+    printf("restarting maze. \n");
+}
+
 void display_main(void) {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
     if(mazeTerrain->reachedEnd(&Camera)){
-        delete mazeTerrain;
-        terrainSizeX += 10;
-        terrainSizeZ += 10;
-        mazeTerrain = new terrain(terrainSizeX, terrainSizeZ, 5);
-        mazeTerrain->load(&Camera);
+        printf("You found the exit, Good Job\n");
+        restartMaze();
     }
 	Camera.Render();
 
@@ -385,15 +392,6 @@ void special(int key, int x, int y) {
 	glutPostRedisplay();
 }
 
-void restartMaze(){
-    delete mazeTerrain;
-    terrainSizeX += 10;
-    terrainSizeZ += 10;
-    mazeTerrain = new terrain(terrainSizeX, terrainSizeZ, 5);
-    mazeTerrain->load(&Camera);
-    printf("restarting maze. \n");
-}
-
 void keyboard(unsigned char key, int x, int y) {
 	switch(key) {
 		case 'q':
@@ -401,7 +399,6 @@ void keyboard(unsigned char key, int x, int y) {
 			break;
 		case 'w':
 			moveCamForward();
-			printf("Camera Position: %f,%f,%f\n", Camera.Position.x, Camera.Position.y, Camera.Position.z);
 			break;
 		case 's':
 			moveCamBackward();
