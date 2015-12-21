@@ -24,7 +24,8 @@ using namespace std;
 
 int terrainSizeX = 10;
 int terrainSizeZ = 10;
-terrain mazeTerrain(terrainSizeX, terrainSizeZ, 5);
+/* terrain mazeTerrain = terrainSizeX, terrainSizeZ, 5); */
+terrain *mazeTerrain = new terrain(terrainSizeX, terrainSizeZ, 5);
 
 //minimap globals:
 int win_minimap;
@@ -217,11 +218,25 @@ void Intersect(int x, int y){
 	printf("far point: %f,%f,%f\n", endL[0], endL[1], endL[2]);
 }
 
+
+void restartMaze(){
+    delete mazeTerrain;
+    terrainSizeX += 10;
+    terrainSizeZ += 10;
+    mazeTerrain = new terrain(terrainSizeX, terrainSizeZ, 5);
+    mazeTerrain->load(&Camera);
+    printf("restarting maze. \n");
+}
+
 void display_main(void) {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
+    if(mazeTerrain->reachedEnd(&Camera)){
+        printf("You found the exit, Good Job\n");
+        restartMaze();
+    }
 	Camera.Render();
 
 	Camera.MoveWithMouse(mouseX);
@@ -260,7 +275,7 @@ void display_main(void) {
 	//pop the matrix back to what it was prior to the rotation
 	// glPopMatrix();
 
-	mazeTerrain.draw();
+	mazeTerrain->draw();
 
 	drawCrosshair();
 
@@ -289,7 +304,7 @@ void display_minimap(){
 	//loop will draw all pixels on the map
 	for (int x=0; x < terrainSizeX; x++){
 		for (int z=0; z < terrainSizeZ; z++){
-			if (mazeTerrain.mazeHeightMap[x][z] != 0){	//if not 0 (wakable path), draw a wall
+			if (mazeTerrain->mazeHeightMap[x][z] != 0){	//if not 0 (wakable path), draw a wall
 			glColor3f(1.0f, 1.0f, 1.0f);
 			// glVertex2f(x+0.5, z+0.5);
 			glVertex2f(z+0.5, (terrainSizeX-1-x)+0.5);	// flip height matrix 90 degrees counter-clockwise
@@ -328,7 +343,7 @@ void moveCamForward() {
 
 	// If the "pretend" move doesn't cause a collision, actually move forward
 	// otherwise, reset the "pretend" move
-	if (!mazeTerrain.checkCollision(Camera.Position.x, Camera.Position.z) || moveForward == true) {
+	if (!mazeTerrain->checkCollision(Camera.Position.x, Camera.Position.z) || moveForward == true) {
 		Camera.MoveForward( 1 );	// reset pretend move
 		Camera.MoveForward( -0.5 );	// actually move
 		moveForward = false;
@@ -351,7 +366,7 @@ void moveCamBackward() {
 		return;
 	}
 
-	if (!mazeTerrain.checkCollision(Camera.Position.x, Camera.Position.z) || moveBack == true) {
+	if (!mazeTerrain->checkCollision(Camera.Position.x, Camera.Position.z) || moveBack == true) {
 		Camera.MoveForward( -1 );	// reset pretend move
 		Camera.MoveForward( 0.5 );	// actually move
 		moveForward = false;
@@ -391,7 +406,6 @@ void keyboard(unsigned char key, int x, int y) {
 			break;
 		case 'w':
 			moveCamForward();
-			// printf("Camera Position: %f,%f,%f\n", Camera.Position.x, Camera.Position.y, Camera.Position.z);
 			break;
 		case 's':
 			moveCamBackward();
@@ -402,6 +416,9 @@ void keyboard(unsigned char key, int x, int y) {
 		case 'a':
 			Camera.StrafeRight(-0.3);
 			break;
+        case 'r':
+            restartMaze();
+            break;
 		case ' ':
 			// Intersect(int(Camera.ViewDir.x), int(Camera.ViewDir.z));
 			// if (Intersect(x,y)) {
@@ -452,7 +469,6 @@ void resize(int x, int y){
 }
 
 void reshape(int x, int y) {
-
 	if (y == 0 || x == 0) return;  //Nothing is visible then, so return
 
 	//Set a new projection matrix
@@ -496,13 +512,12 @@ int main(int argc, char** argv) {
 	glutWarpPointer(300, 300);			// move cursor to middle of window
 
 	// initialize random seed
-	/* srand((0)); */
 	int seed = time(NULL);
     srand(seed);
     printf("Current Seed: %d\n", seed);
 
 
-	mazeTerrain.load(&Camera);
+	mazeTerrain->load(&Camera);
     /* Camera.setPosition(0,0,6); */
 	// Camera.Move( F3dVector(-31.0, playerHeight, 35.0 ));
 	// Camera.MoveForward( 1.0 );

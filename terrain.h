@@ -66,11 +66,13 @@ class terrain {
 public:
 	int sizeX, sizeZ, height;
 	int **mazeHeightMap;
+    SF3dVector * endPos;
 
 	terrain(int sizeX, int sizeZ, int height);
 	void load(CCamera * cam);
 	void draw();
 	bool checkCollision(float xPos, float zPos);
+    bool reachedEnd(CCamera *cam);
 
 private:
 	vector<vertex3D>*verts;
