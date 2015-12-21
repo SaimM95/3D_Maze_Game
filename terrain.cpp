@@ -105,21 +105,12 @@ void terrain::load(CCamera * cam) {
 	calcFaceNormals();
 	calcVertexNormals();
 
-    printf("startX:%i, startZ:%i\n",startX, startZ);
     float camPosX, camPosZ;
     convertHeightMapToFace2(startX, startZ, &camPosX, &camPosZ);
     cam->setPosition(camPosX, 2, camPosZ);
     endPos->x = endX;
     endPos->y = 1;
     endPos->z = endZ;
-    printf("endPos:(%f,%f,%f), startPos:(%i,%i,%i)\n",endPos->x, endPos->y, endPos->z , startX, 1, startZ);
-    float a, b, c, d;
-    convertHeightMapToFace2(endPos->x, endPos->z, &a,&b);
-    convertHeightMapToFace2(startX, startZ, &c,&d);
-    printf("after positions end:(%f,%f)   start:(%f,%f)\n",a,b,c,d);
-    /* cam->setPosition(-45,1,-45); */
-    printf("cameraPosition:(%f,%f,%f)\n", cam->Position.x, cam->Position.y, cam->Position.z);
-
 
 	// Testing convert function
 	// float *centerPoint = convertHeightMapToFace(1,1);
@@ -270,7 +261,7 @@ void terrain::generateMaze(CCamera *cam, int * startXp, int*startZp, int*endXp, 
   mazeHeightMap[endX][endZ] = 11;
   *startXp = startX;
   *startZp = startZ;
-  printf("endX:%i, endZ:%i\n",endX, endZ);
+  /* printf("endX:%i, endZ:%i\n",endX, endZ); */
 
   if(endX == sizeX-1 || endZ == sizeZ-1){
     xStep = endX, zStep = endZ;
@@ -428,7 +419,6 @@ float* terrain::convertHeightMapToFace(int i, int j) {
 	centerPoint[2] = (faces->at(faceIndex).v3.z + faces->at(faceIndex).v1.z) / 2;
 
 	centerPoint[1] = mazeHeightMap[i][j];
-    printf("centerPoint:(%f,%f,%f)\n", centerPoint[0], centerPoint[1], centerPoint[2]);
 
 	return centerPoint;
 }
@@ -440,21 +430,12 @@ void terrain::convertHeightMapToFace2(int i, int j, float *posX, float*posZ) {
 	*posZ = (faces->at(faceIndex).v3.z + faces->at(faceIndex).v1.z) / 2;
 }
 
-SF3dVector convertToGridPos(SF3dVector pos){
-  return SF3dVector();
-}
-
 bool terrain::reachedEnd(CCamera *cam){
-    /* SF3dVector gridVec =  convertToGridPos(cam->Position); */
-    /* return (gridVec.x ==  endPos->x && gridVec.y ==  endPos->y && gridVec.z ==  endPos->z); */
     float x, z;
     convertHeightMapToFace2(endPos->x, endPos->z, &x,&z);
 
-    /* float dist = cam->Position.x*cam->Position.x + cam->Position.y * cam->Position.y + cam->Position.z * cam->Position.z; */
     float dist = pow(cam->Position.x - x, 2) + pow(cam->Position.z - z , 2);
     dist = sqrt(dist);
-    /* printf("dist:%f endPos:(%f,%f,%f), x:%f, z:%f, camPos:(%f,%f,%f)\n", dist, endPos->x, endPos->y, endPos->z, x,z,cam->Position.x, cam->Position.y, cam->Position.z); */
     return (dist < 10);
-
 }
 
