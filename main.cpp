@@ -221,7 +221,7 @@ void display_main(void) {
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
-    if(mazeTerrain->reachedEnd()){
+    if(mazeTerrain->reachedEnd(&Camera)){
         delete mazeTerrain;
         terrainSizeX += 10;
         terrainSizeZ += 10;
@@ -385,6 +385,15 @@ void special(int key, int x, int y) {
 	glutPostRedisplay();
 }
 
+void restartMaze(){
+    delete mazeTerrain;
+    terrainSizeX += 10;
+    terrainSizeZ += 10;
+    mazeTerrain = new terrain(terrainSizeX, terrainSizeZ, 5);
+    mazeTerrain->load(&Camera);
+    printf("restarting maze. \n");
+}
+
 void keyboard(unsigned char key, int x, int y) {
 	switch(key) {
 		case 'q':
@@ -403,6 +412,9 @@ void keyboard(unsigned char key, int x, int y) {
 		case 'a':
 			Camera.StrafeRight(-0.3);
 			break;
+        case 'r':
+            restartMaze();
+            break;
 		case ' ':
 			// Intersect(int(Camera.ViewDir.x), int(Camera.ViewDir.z));
 			// if (Intersect(x,y)) {
@@ -453,7 +465,6 @@ void resize(int x, int y){
 }
 
 void reshape(int x, int y) {
-
 	if (y == 0 || x == 0) return;  //Nothing is visible then, so return
 
 	//Set a new projection matrix

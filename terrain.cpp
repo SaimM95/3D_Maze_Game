@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <vector>
 #include <math.h>
+#include "camera.h"
 #include "terrain.h"
 
 #ifdef __APPLE__
@@ -430,8 +431,12 @@ void terrain::convertHeightMapToFace2(int i, int j, float *posX, float*posZ) {
 	*posZ = (faces->at(faceIndex).v3.z + faces->at(faceIndex).v1.z) / 2;
 }
 
-bool terrain::reachedEnd(){
-   return false;
+SF3dVector convertToGridPos(SF3dVector pos){
+  return SF3dVector();
 }
 
+bool terrain::reachedEnd(CCamera *cam){
+    SF3dVector gridVec =  convertToGridPos(cam->Position);
+    return (gridVec.x ==  endPos->x && gridVec.y ==  endPos->y && gridVec.z ==  endPos->z);
+}
 

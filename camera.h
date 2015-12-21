@@ -52,7 +52,7 @@ public:
 
 	float yaw;
 	int mouseX, oldMouseX;
-	
+
 	CCamera();				//inits the values (Position: (0|0|0) Target: (0|0|-1) )
 	void Render ( void );	//executes some glRotates and a glTranslate command
 							//Note: You should call glLoadIdentity before using Render
