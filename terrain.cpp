@@ -231,9 +231,9 @@ void terrain::generateMaze(CCamera *cam, int * startXp, int*startZp, int*endXp, 
   int startX, startZ;
   if(rand()%2 > 0){
     startX = (rand()%(sizeX/2-1)) * 2 + 1;
-    startZ = (rand()%2 > 0)? 0:sizeZ-1;
+    startZ = 0;
   }else{
-    startX = (rand()%2 > 0)? 0:sizeX-1;
+    startX = 0;
     startZ = (rand()%(sizeZ/2-1)) * 2 + 1;
   }
   mazeHeightMap[startX][startZ] = 11;
