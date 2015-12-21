@@ -72,6 +72,7 @@ public:
 	void draw();
 	bool checkCollision(float xPos, float zPos);
 
+    float* convertHeightMapToFace(int i, int j);
 private:
 	vector<vertex3D>*verts;
 	vector<faces3D>*faces;
@@ -79,7 +80,6 @@ private:
 	vector<vertex3D>*vertexNormals;
 
 	void generateMaze(CCamera *cam);
-    float* convertHeightMapToFace(int i, int j);
 	void showMaze();
 	void calcFaceNormals();
 	void calcVertexNormals();

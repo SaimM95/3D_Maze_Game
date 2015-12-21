@@ -64,6 +64,9 @@ bool sphereAlive = true;
 
 int mouseX = 0;
 
+int enemyCount = 1;
+float *centerPoint;
+
 /* TEXTURE */
 GLubyte *img_data;
 int width, height, maximum;
@@ -268,13 +271,27 @@ void display_main(void) {
 		glVertex3f(endL[0], endL[1], endL[2]);
 	glEnd();
 
-	if (sphereAlive) {
-		glPushMatrix();
-		glTranslatef(18,2,11);
-		glColor3f(1,0,0);
-		glutSolidSphere(1,20,20);
-		glPopMatrix();
+	if (enemyCount == 1) {
+		// for (int x = 0; x < terrainSizeX; ++x) {
+		// 	for (int z = 0; z < terrainSizeZ; ++z) {
+		// 		if (mazeTerrain.mazeHeightMap[x][z] = 0) {
+		centerPoint = mazeTerrain.convertHeightMapToFace(2,1);
+		// 			break;
+		// 		}
+		// 	}
+		// }
+		// Camera.Move(F3dVector(centerPoint[0], centerPoint[1], centerPoint[2]));
+		Camera.setPosition(centerPoint[0], 2, centerPoint[2]);
+		enemyCount = 0;
 	}
+
+	// if (enemyCount == 0) {
+	// 	// glPushMatrix();
+	// 	// glTranslatef(centerPoint[0],2,centerPoint[2]);
+	// 	// glColor3f(1,0,0);
+	// 	// glutSolidCube(1);
+	// 	// glPopMatrix();
+	// }
 
 	glFlush();
 	glutSwapBuffers();
@@ -284,26 +301,32 @@ void display_minimap(){
 	glClear(GL_COLOR_BUFFER_BIT);
 	glPointSize(200/terrainSizeX);
 	glBegin(GL_POINTS);
+	printf("\nMINIMAP:\n");
 	//loop will draw all pixels on the map
 	for (int x=0; x < terrainSizeX; x++){
 		for (int z=0; z < terrainSizeZ; z++){
-			if (mazeTerrain.mazeHeightMap[x][z] != 0){	//if not 0 (wakable path), draw a wall
+			if (mazeTerrain.mazeHeightMap[x][z] == 0){	//if not 0 (wakable path), draw a wall
 			glColor3f(1.0f, 1.0f, 1.0f);
-			glVertex2f(x+0.5, z+0.5);
+			glVertex2f(z+0.5, (terrainSizeX-1-x)+0.5);	// flip height matrix 90 degrees counter-clockwise
 			}
+			printf("%d ", mazeTerrain.mazeHeightMap[x][z]);
 		}
+		printf("\n");
 	}
 	glEnd();
 
 	//calculate player coord on minimap real quick:
-	float mx = (Camera.Position.x+49.0f)/9.5;
-	float mz = (Camera.Position.z-49.5f)/9.5*-1;
+	float mx = (Camera.Position.x + ((float)terrainSizeX*5)) / 10;//+49.0f)/9.5;
+	float mz = (Camera.Position.z + ((float)terrainSizeZ*5)) / 10;//-49.5f)/9.5*-1;
+	printf("BALH: %f\n", (float) Camera.Position.x);
 
 	//glutSetWindow(win_minimap);
 	glPointSize(dotSize);
 	glBegin(GL_POINTS);
 	glColor3f(0.0f,1.0f,0.0f);		//Color of the player dot is green
-	glVertex2f(mx, mz); //The position of the camera
+	glVertex2f(terrainSizeZ - mz, terrainSizeX - mx); //The position of the camera
+	// printf("CameraX: %f  CameraZ: %f\n", Camera.Position.x, Camera.Position.z);
+	printf("MX: %f  MZ: %f\n", mx, mz);
 	//printf("Position:%f,%f,%f\n", (Camera.Position.x+49.0f)/9.5, Camera.Position.y, (Camera.Position.z-49.5f)/9.5f);
 	glEnd();
 	glFlush();
@@ -332,6 +355,8 @@ void moveCamForward() {
 		moveBack = true;
 		printf("Move Back\n");
 	}
+
+	printf("Camera Position: %f,%f,%f\n", Camera.Position.x, Camera.Position.y, Camera.Position.z);
 }
 
 void moveCamBackward() {
@@ -475,6 +500,7 @@ int main(int argc, char** argv) {
 	glutInitDisplayMode(GLUT_RGB | GLUT_SINGLE);
 	win_minimap = glutCreateWindow("Minimap");
 	glutDisplayFunc(display_minimap);
+	// glutIdleFunc(display_minimap);
 	glClearColor(0,0,0,0);
 	glLoadIdentity();
 	gluOrtho2D(0, terrainSizeX, 0, terrainSizeZ);
@@ -489,7 +515,7 @@ int main(int argc, char** argv) {
 
 	// initialize random seed
 	/* srand((0)); */
-	int seed = time(NULL);
+	int seed = 1450643708; //time(NULL);
     srand(seed);
     printf("Current Seed: %d\n", seed);
 

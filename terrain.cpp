@@ -381,9 +381,12 @@ void terrain::startDFS(int x, int z){
 
 // Private function: Print out the mazeHeightMap array
 void terrain::showMaze() {
-    for (int z = 0; z < sizeZ; ++z) {
-        for (int x = 0; x < sizeX; ++x) {
-			printf("%d ", mazeHeightMap[x][z]);
+    for (int x = 0; x < sizeX; ++x) {
+    	for (int z = 0; z < sizeZ; ++z) {
+			if (x == 1 && z == 9) {
+				printf("X");
+			}
+			else printf("%d ", mazeHeightMap[x][z]);
 		}
 		printf("\n");
 	}
@@ -462,6 +465,13 @@ float* terrain::convertHeightMapToFace(int i, int j) {
 
 	centerPoint[1] = mazeHeightMap[i][j];
 
+	printf("X:%d Z:%d\n", i,j);
+	printf("FaceNum: %d ", faceIndex);
+	printf("Center Point: %f,%f,%f\n", centerPoint[0], centerPoint[1], centerPoint[2]);
+	faces->at(faceIndex).v1.show();
+	faces->at(faceIndex).v2.show();
+	faces->at(faceIndex).v3.show();
+	faces->at(faceIndex).v4.show();
 	return centerPoint;
 }
 
