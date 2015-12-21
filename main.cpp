@@ -221,6 +221,13 @@ void display_main(void) {
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
+    if(mazeTerrain->reachedEnd()){
+        delete mazeTerrain;
+        terrainSizeX += 10;
+        terrainSizeZ += 10;
+        mazeTerrain = new terrain(terrainSizeX, terrainSizeZ, 5);
+        mazeTerrain->load(&Camera);
+    }
 	Camera.Render();
 
 	Camera.MoveWithMouse(mouseX);

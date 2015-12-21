@@ -71,6 +71,7 @@ public:
 	void load(CCamera * cam);
 	void draw();
 	bool checkCollision(float xPos, float zPos);
+    bool reachedEnd();
 
 private:
 	vector<vertex3D>*verts;

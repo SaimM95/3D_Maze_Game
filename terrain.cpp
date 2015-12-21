@@ -430,3 +430,8 @@ void terrain::convertHeightMapToFace2(int i, int j, float *posX, float*posZ) {
 	*posZ = (faces->at(faceIndex).v3.z + faces->at(faceIndex).v1.z) / 2;
 }
 
+bool terrain::reachedEnd(){
+   return false;
+}
+
+
