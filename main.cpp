@@ -384,6 +384,7 @@ void keyboard(unsigned char key, int x, int y) {
 			break;
 		case 'w':
 			moveCamForward();
+			printf("Camera Position: %f,%f,%f\n", Camera.Position.x, Camera.Position.y, Camera.Position.z);
 			break;
 		case 's':
 			moveCamBackward();
@@ -496,8 +497,8 @@ int main(int argc, char** argv) {
 
 	mazeTerrain.load(&Camera);
     /* Camera.setPosition(0,0,6); */
-	Camera.Move( F3dVector(-31.0, playerHeight, 35.0 ));
-	Camera.MoveForward( 1.0 );
+	// Camera.Move( F3dVector(-31.0, playerHeight, 35.0 ));
+	// Camera.MoveForward( 1.0 );
 
 	glutCallbacks();
 
