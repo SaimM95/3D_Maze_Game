@@ -289,21 +289,26 @@ void display_minimap(){
 		for (int z=0; z < terrainSizeZ; z++){
 			if (mazeTerrain.mazeHeightMap[x][z] != 0){	//if not 0 (wakable path), draw a wall
 			glColor3f(1.0f, 1.0f, 1.0f);
-			glVertex2f(x+0.5, z+0.5);
+			// glVertex2f(x+0.5, z+0.5);
+			glVertex2f(z+0.5, (terrainSizeX-1-x)+0.5);	// flip height matrix 90 degrees counter-clockwise
 			}
 		}
 	}
 	glEnd();
 
 	//calculate player coord on minimap real quick:
-	float mx = (Camera.Position.x+49.0f)/9.5;
-	float mz = (Camera.Position.z-49.5f)/9.5*-1;
+	// float mx = (Camera.Position.x+49.0f)/9.5;
+	// float mz = (Camera.Position.z-49.5f)/9.5*-1;
+
+	float mx = (Camera.Position.x + ((float)terrainSizeX*5)) / 10;
+	float mz = (Camera.Position.z + ((float)terrainSizeZ*5)) / 10;
 
 	//glutSetWindow(win_minimap);
 	glPointSize(dotSize);
 	glBegin(GL_POINTS);
 	glColor3f(0.0f,1.0f,0.0f);		//Color of the player dot is green
-	glVertex2f(mx, mz); //The position of the camera
+	// glVertex2f(mx, mz); //The position of the camera
+	glVertex2f(terrainSizeZ - mz, terrainSizeX - mx); //The position of the camera
 	//printf("Position:%f,%f,%f\n", (Camera.Position.x+49.0f)/9.5, Camera.Position.y, (Camera.Position.z-49.5f)/9.5f);
 	glEnd();
 	glFlush();
@@ -384,7 +389,7 @@ void keyboard(unsigned char key, int x, int y) {
 			break;
 		case 'w':
 			moveCamForward();
-			printf("Camera Position: %f,%f,%f\n", Camera.Position.x, Camera.Position.y, Camera.Position.z);
+			// printf("Camera Position: %f,%f,%f\n", Camera.Position.x, Camera.Position.y, Camera.Position.z);
 			break;
 		case 's':
 			moveCamBackward();
@@ -490,7 +495,7 @@ int main(int argc, char** argv) {
 
 	// initialize random seed
 	/* srand((0)); */
-	int seed = 1450643708; //time(NULL);
+	int seed = time(NULL);
     srand(seed);
     printf("Current Seed: %d\n", seed);
 

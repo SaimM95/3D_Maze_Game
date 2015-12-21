@@ -106,7 +106,7 @@ void terrain::load(CCamera * cam) {
 
     printf("startX:%i, startZ:%i\n",startX, startZ);
     float camPosX, camPosZ;
-    convertHeightMapToFace2(7, 9, &camPosX, &camPosZ);
+    convertHeightMapToFace2(startX, startZ, &camPosX, &camPosZ);
     cam->setPosition(camPosX, 2, camPosZ);
     printf("cameraPosition:(%f,%f,%f)\n", cam->Position.x, cam->Position.y, cam->Position.z);
 
