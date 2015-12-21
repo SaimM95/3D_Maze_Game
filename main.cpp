@@ -510,7 +510,7 @@ int main(int argc, char** argv) {
 	glutWarpPointer(300, 300);			// move cursor to middle of window
 
 	// initialize random seed
-	int seed = 1450670567;//time(NULL);
+	int seed = time(NULL);
     srand(seed);
     printf("Current Seed: %d\n", seed);
 
