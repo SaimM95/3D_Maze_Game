@@ -268,13 +268,13 @@ void display_main(void) {
 		glVertex3f(endL[0], endL[1], endL[2]);
 	glEnd();
 
-	if (sphereAlive) {
-		glPushMatrix();
-		glTranslatef(18,2,11);
-		glColor3f(1,0,0);
-		glutSolidSphere(1,20,20);
-		glPopMatrix();
-	}
+	// if (sphereAlive) {
+	// 	glPushMatrix();
+	// 	glTranslatef(18,2,11);
+	// 	glColor3f(1,0,0);
+	// 	glutSolidSphere(1,20,20);
+	// 	glPopMatrix();
+	// }
 
 	glFlush();
 	glutSwapBuffers();
