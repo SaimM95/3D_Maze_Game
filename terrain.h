@@ -84,7 +84,7 @@ private:
 	void showMaze();
 	void calcFaceNormals();
 	void calcVertexNormals();
-	void drawWall(int v1, int v2);
+	void drawWall(int v1, int v2, int n);
     void startDFS(int x, int z);;
 };
 #endif

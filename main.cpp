@@ -41,15 +41,17 @@ float upVect[] = {0,1,0};
 float camPos[] = {50,0,50};
 float camFocus[] = {0,0,0};
 
-float light_pos[] = {0, 100, 0,1};
+float light_pos[] = {0, 50, 0, 1};
 
-float amb1[] = {1, 0, 1, 1};
-float diff1[] = {1, 0, 0, 1};
-float spec1[] = {1, 1, 0, 1};
+// light
+float amb1[] = {0.5, 0.5, 0.5, 1};
+float diff1[] = {0.7, 0.7, 0.7, 1};
+float spec1[] = {1, 1, 1, 1};
 
-float m_amb[] = {0.22, 0.11, 0.03, 1.0};
-float m_diff[] = {0.78, 0.57, 0.11, 1.0};
-float m_spec[] = {0.99, 0.91, 0.81, 1.0};
+//floor material
+float m_amb[] = {0, 0, 0, 1.0};
+float m_diff[] = {1, 0.5, 0, 1.0};
+float m_spec[] = {1, 1, 1, 1.0};
 float shiny = 5;
 
 bool moveBack = false;
