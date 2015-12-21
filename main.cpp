@@ -24,7 +24,8 @@ using namespace std;
 
 int terrainSizeX = 10;
 int terrainSizeZ = 10;
-terrain mazeTerrain(terrainSizeX, terrainSizeZ, 5);
+/* terrain mazeTerrain = terrainSizeX, terrainSizeZ, 5); */
+terrain *mazeTerrain = new terrain(terrainSizeX, terrainSizeZ, 5);
 
 //minimap globals:
 int win_minimap;
@@ -258,7 +259,7 @@ void display_main(void) {
 	//pop the matrix back to what it was prior to the rotation
 	// glPopMatrix();
 
-	mazeTerrain.draw();
+	mazeTerrain->draw();
 
 	drawCrosshair();
 
@@ -287,7 +288,7 @@ void display_minimap(){
 	//loop will draw all pixels on the map
 	for (int x=0; x < terrainSizeX; x++){
 		for (int z=0; z < terrainSizeZ; z++){
-			if (mazeTerrain.mazeHeightMap[x][z] != 0){	//if not 0 (wakable path), draw a wall
+			if (mazeTerrain->mazeHeightMap[x][z] != 0){	//if not 0 (wakable path), draw a wall
 			glColor3f(1.0f, 1.0f, 1.0f);
 			glVertex2f(x+0.5, z+0.5);
 			}
@@ -321,7 +322,7 @@ void moveCamForward() {
 
 	// If the "pretend" move doesn't cause a collision, actually move forward
 	// otherwise, reset the "pretend" move
-	if (!mazeTerrain.checkCollision(Camera.Position.x, Camera.Position.z) || moveForward == true) {
+	if (!mazeTerrain->checkCollision(Camera.Position.x, Camera.Position.z) || moveForward == true) {
 		Camera.MoveForward( 1 );	// reset pretend move
 		Camera.MoveForward( -0.5 );	// actually move
 		moveForward = false;
@@ -344,7 +345,7 @@ void moveCamBackward() {
 		return;
 	}
 
-	if (!mazeTerrain.checkCollision(Camera.Position.x, Camera.Position.z) || moveBack == true) {
+	if (!mazeTerrain->checkCollision(Camera.Position.x, Camera.Position.z) || moveBack == true) {
 		Camera.MoveForward( -1 );	// reset pretend move
 		Camera.MoveForward( 0.5 );	// actually move
 		moveForward = false;
@@ -495,7 +496,7 @@ int main(int argc, char** argv) {
     printf("Current Seed: %d\n", seed);
 
 
-	mazeTerrain.load(&Camera);
+	mazeTerrain->load(&Camera);
     /* Camera.setPosition(0,0,6); */
 	// Camera.Move( F3dVector(-31.0, playerHeight, 35.0 ));
 	// Camera.MoveForward( 1.0 );
