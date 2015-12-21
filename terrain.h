@@ -80,6 +80,7 @@ private:
 
 	void generateMaze(CCamera *cam, int * startX, int * startZ, int * endX, int *endZ);
     float* convertHeightMapToFace(int i, int j);
+    void convertHeightMapToFace2(int i, int j, float *posX, float *posZ);
 	void showMaze();
 	void calcFaceNormals();
 	void calcVertexNormals();

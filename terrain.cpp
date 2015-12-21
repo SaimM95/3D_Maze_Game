@@ -105,10 +105,9 @@ void terrain::load(CCamera * cam) {
 	calcVertexNormals();
 
     printf("startX:%i, startZ:%i\n",startX, startZ);
-    float* camPos = convertHeightMapToFace(startX, startZ);
-    printf("camPos(%f,%f,%f)\n", camPos[0], camPos[1], camPos[2]);
-    cam->setPosition(camPos[0], 1, camPos[2]);
-    /* cam->setPosition(-35, 1,-45);//camPos[0], 1, camPos[2]); */
+    float camPosX, camPosZ;
+    convertHeightMapToFace2(startX, startZ, &camPosX, &camPosZ);
+    cam->setPosition(camPosX, 1, camPosZ);
     printf("cameraPosition:(%f,%f,%f)\n", cam->Position.x, cam->Position.y, cam->Position.z);
 
 
@@ -422,5 +421,12 @@ float* terrain::convertHeightMapToFace(int i, int j) {
     printf("centerPoint:(%f,%f,%f)\n", centerPoint[0], centerPoint[1], centerPoint[2]);
 
 	return centerPoint;
+}
+
+void terrain::convertHeightMapToFace2(int i, int j, float *posX, float*posZ) {
+	int faceIndex = (i*sizeX) + j;
+
+	*posX = (faces->at(faceIndex).v3.x + faces->at(faceIndex).v1.x) / 2;
+	*posZ = (faces->at(faceIndex).v3.z + faces->at(faceIndex).v1.z) / 2;
 }
 
