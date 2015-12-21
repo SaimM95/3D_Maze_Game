@@ -48,7 +48,8 @@ terrain::terrain(int sizeX, int sizeZ, int height) {
 
 // Load the maze terrain
 void terrain::load(CCamera * cam) {
-	generateMaze(cam);
+    int startX, startZ, endX, endZ;
+	generateMaze(cam, &startX,&startZ,&endX,&endZ);
 	showMaze();
 	// Use maze2d.mazeHeightMap[][] for height (y-coords) of each vertex
 	// ...
@@ -100,6 +101,10 @@ void terrain::load(CCamera * cam) {
 		}
 	}
 
+  float* camPos = convertHeightMapToFace(startX, startZ);
+  cam->setPosition(camPos[0], 1, camPos[2]);
+  printf("startX:%i, startZ:%i\n",startX, startZ);
+  printf("cameraPosition:(%f,%f,%f)\n", cam->Position.x, cam->Position.y, cam->Position.z);
 
 	calcFaceNormals();
 	calcVertexNormals();
@@ -198,59 +203,7 @@ bool terrain::checkCollision(float xPos, float zPos) {
 	// 		faces->at(10).v3.x, faces->at(10).v1.x, faces->at(10).v1.z, faces->at(10).v3.z, xPos, zPos);
 }
 
-// Private function: Populate mazeHeightMap array
-/* void generateMaze2() { */
-	/* // Put walls on all the edges of the terrain */
-	/* for (int x = 0; x < sizeX; ++x) { */
-	/* 	for (int z = 0; z < sizeZ; ++z) { */
-	/* 		if (x == 0 || z == 0 || x == sizeX-1 || z == sizeZ-1) */
-	/* 			mazeHeightMap[x][z] = height; */
-	/* 	} */
-	/* } */
-
-	/* // mazeHeightMap[10][10] = { */
-	/* // 				{5,5,5,5,5,5,5,5,5,5}, */
-	/* // 			s->	{0,0,5,0,5,0,0,0,0,5}, */
-	/* // 				{5,0,5,0,5,0,5,0,5,5}, */
-	/* // 				{5,0,5,0,5,0,5,0,5,5}, */
-	/* // 				{5,0,5,0,5,0,0,0,0,5}, */
-	/* // 				{5,0,5,0,5,0,5,5,0,5}, */
-	/* // 				{5,0,0,0,5,0,5,0,0,5}, */
-	/* // 				{5,0,5,0,5,0,5,0,5,5}, */
-	/* // 				{5,0,5,0,0,0,5,0,0,0}, <- f */
-	/* // 				{5,5,5,5,5,5,5,5,5,5} */
-	/* // 			}; */
-
-	/* // Generate maze walls */
-	/* // ... */
-	/* mazeHeightMap[1][0] = 0; */
-	/* mazeHeightMap[1][2] = 5; */
-	/* mazeHeightMap[2][2] = 5; */
-	/* mazeHeightMap[3][2] = 5; */
-	/* mazeHeightMap[4][2] = 5; */
-	/* mazeHeightMap[5][2] = 5; */
-	/* mazeHeightMap[7][2] = 5; */
-	/* mazeHeightMap[8][2] = 5; */
-	/* mazeHeightMap[1][4] = 5; */
-	/* mazeHeightMap[2][4] = 5; */
-	/* mazeHeightMap[3][4] = 5; */
-	/* mazeHeightMap[4][4] = 5; */
-	/* mazeHeightMap[5][4] = 5; */
-	/* mazeHeightMap[6][4] = 5; */
-	/* mazeHeightMap[7][4] = 5; */
-	/* mazeHeightMap[2][6] = 5; */
-	/* mazeHeightMap[3][6] = 5; */
-	/* mazeHeightMap[5][6] = 5; */
-	/* mazeHeightMap[6][6] = 5; */
-	/* mazeHeightMap[7][6] = 5; */
-	/* mazeHeightMap[8][6] = 5; */
-	/* mazeHeightMap[5][7] = 5; */
-	/* mazeHeightMap[2][8] = 5; */
-	/* mazeHeightMap[3][8] = 5; */
-	/* mazeHeightMap[7][8] = 5; */
-	/* mazeHeightMap[8][9] = 0; */
-/* } */
-void terrain::generateMaze(CCamera *cam){
+void terrain::generateMaze(CCamera *cam, int * startXp, int*startZp, int*endXp, int* endZp){
   // make everything equal to -1
   for (int x = 0; x < sizeX; ++x) {
     for (int z = 0; z < sizeZ; ++z) {
@@ -282,10 +235,8 @@ void terrain::generateMaze(CCamera *cam){
   }
   mazeHeightMap[startX][startZ] = 11;
   /* showMaze(); */
-  float* camPos = convertHeightMapToFace(startX, startZ);
-  cam->setPosition(camPos[0], 1, camPos[2]);
-  printf("startX:%i, startZ:%i\n",startX, startZ);
-  printf("cameraPosition:(%f,%f,%f)\n", cam->Position.x, cam->Position.y, cam->Position.z);
+
+
 
   // starting the DFS
   int xStep = startX, zStep = startZ;
@@ -305,6 +256,8 @@ void terrain::generateMaze(CCamera *cam){
   }
   /* printf("endX:%i, endZ:%i\n",endX,endZ); */
   mazeHeightMap[endX][endZ] = 11;
+  *startXp = startX;
+  *startZp = startZ;
   printf("endX:%i, endZ:%i\n",endX, endZ);
 
   if(endX == sizeX-1 || endZ == sizeZ-1){
@@ -313,6 +266,8 @@ void terrain::generateMaze(CCamera *cam){
     else if(zStep == 0 || zStep == sizeZ-1) zStep += 1 - 2*(zStep)/(sizeZ-1);
     mazeHeightMap[xStep][zStep] = 11;
   }
+  *endXp = endX;
+  *endZp = endZ;
   /* showMaze(); */
 
 
