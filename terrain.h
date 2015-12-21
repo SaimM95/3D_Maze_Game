@@ -73,6 +73,7 @@ public:
 	bool checkCollision(float xPos, float zPos);
 
     float* convertHeightMapToFace(int i, int j);
+    void convertHeightMapToFace2(int i, int j, float *posX, float*posZ);
 private:
 	vector<vertex3D>*verts;
 	vector<faces3D>*faces;

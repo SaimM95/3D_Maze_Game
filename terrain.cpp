@@ -475,3 +475,10 @@ float* terrain::convertHeightMapToFace(int i, int j) {
 	return centerPoint;
 }
 
+void terrain::convertHeightMapToFace2(int i, int j, float *posX, float*posZ) {
+	int faceIndex = (i*sizeX) + j;
+
+	*posX = (faces->at(faceIndex).v3.x + faces->at(faceIndex).v1.x) / 2;
+	*posZ = (faces->at(faceIndex).v3.z + faces->at(faceIndex).v1.z) / 2;
+}
+

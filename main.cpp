@@ -65,7 +65,7 @@ bool sphereAlive = true;
 int mouseX = 0;
 
 int enemyCount = 1;
-float *centerPoint;
+float startCamX, startCamZ, centerPointX = 0, centerPointZ = 0;
 
 /* TEXTURE */
 GLubyte *img_data;
@@ -225,7 +225,7 @@ void display_main(void) {
 
 	Camera.Render();
 
-	Camera.MoveWithMouse(mouseX);
+	// Camera.MoveWithMouse(mouseX);
 
 	glColor3f(1,1,1); // White light color
 	glEnable(GL_LIGHT0);
@@ -261,7 +261,7 @@ void display_main(void) {
 	//pop the matrix back to what it was prior to the rotation
 	// glPopMatrix();
 
-	mazeTerrain.draw();
+	// mazeTerrain.draw();
 
 	drawCrosshair();
 
@@ -275,23 +275,25 @@ void display_main(void) {
 		// for (int x = 0; x < terrainSizeX; ++x) {
 		// 	for (int z = 0; z < terrainSizeZ; ++z) {
 		// 		if (mazeTerrain.mazeHeightMap[x][z] = 0) {
-		centerPoint = mazeTerrain.convertHeightMapToFace(2,1);
+		// mazeTerrain.convertHeightMapToFace2(2,1,&centerPointX,&centerPointZ);
+		// mazeTerrain.convertHeightMapToFace2(3,1,&startCamX,&startCamZ);
 		// 			break;
 		// 		}
 		// 	}
 		// }
 		// Camera.Move(F3dVector(centerPoint[0], centerPoint[1], centerPoint[2]));
-		Camera.setPosition(centerPoint[0], 2, centerPoint[2]);
+		// Camera.setPosition(startCamX, 2, startCamZ);
 		enemyCount = 0;
 	}
 
-	// if (enemyCount == 0) {
-	// 	// glPushMatrix();
-	// 	// glTranslatef(centerPoint[0],2,centerPoint[2]);
-	// 	// glColor3f(1,0,0);
-	// 	// glutSolidCube(1);
-	// 	// glPopMatrix();
-	// }
+	if (enemyCount == 0) {
+		glPushMatrix();
+		glTranslatef(centerPointX,2,centerPointZ);
+		glColor3f(1,0,0);
+		glutSolidCube(1);
+		glPopMatrix();
+		printf("Cube Pos: %f,%f,%f\n", centerPointX, 2.0f,centerPointZ);
+	}
 
 	glFlush();
 	glutSwapBuffers();
@@ -419,6 +421,18 @@ void keyboard(unsigned char key, int x, int y) {
 		case 'a':
 			Camera.StrafeRight(-0.3);
 			break;
+		case 'K':
+			centerPointX += 1;
+			break;
+		case 'k':
+			centerPointX -= 1;
+			break;
+		case 'L':
+			centerPointZ += 1;
+			break;
+		case 'l':
+			centerPointZ -= 1;
+			break;
 		case ' ':
 			// Intersect(int(Camera.ViewDir.x), int(Camera.ViewDir.z));
 			// if (Intersect(x,y)) {
@@ -520,10 +534,10 @@ int main(int argc, char** argv) {
     printf("Current Seed: %d\n", seed);
 
 
-	mazeTerrain.load(&Camera);
+	// mazeTerrain.load(&Camera);
     /* Camera.setPosition(0,0,6); */
-	Camera.Move( F3dVector(-31.0, playerHeight, 35.0 ));
-	Camera.MoveForward( 1.0 );
+	// Camera.Move( F3dVector(0, 10, 0));
+	// Camera.MoveForward( 1.0 );
 
 	glutCallbacks();
 

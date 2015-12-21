@@ -92,9 +92,9 @@ float operator* (SF3dVector v, SF3dVector u)	//dot product
 CCamera::CCamera()
 {
 	//Init with standard OGL values:
-	Position = F3dVector (0.0, 0.0,0.0);
-	ViewDir = F3dVector( 1.0, 0.0, 0.0);
-	UpVector = F3dVector (0.0, 1.0, 0.0);
+	Position = F3dVector (0.0, 10.0,0.0);
+	ViewDir = F3dVector( 0.0, 0.0, 0.0);
+	UpVector = F3dVector (1.0, 0.0, 0.0);
 	// RightVector = F3dVector (1.0, 0.0, 0.0);
 	RightVector = CrossProduct(&ViewDir, &UpVector)*(-1);
 
