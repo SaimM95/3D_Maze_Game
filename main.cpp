@@ -253,7 +253,7 @@ void display_main(void) {
     glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, m_spec);
     glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, shiny);
 
-	drawAxis();
+	// drawAxis();
 
 	// glPushMatrix();
 
