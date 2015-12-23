@@ -47,7 +47,13 @@ terrain::terrain(int sizeX, int sizeZ, int height) {
 		}
 	}
 }
+terrain::~terrain(){
+  delete endPos;
+  for(int i = 0; i < sizeX; i++)
+    delete[] mazeHeightMap[i];
+  delete[] mazeHeightMap;
 
+}
 // Load the maze terrain
 void terrain::load(CCamera * cam) {
     int startX, startZ, endX, endZ;

@@ -69,6 +69,7 @@ public:
     SF3dVector * endPos;
 
 	terrain(int sizeX, int sizeZ, int height);
+    ~terrain();
 	void load(CCamera * cam);
 	void draw();
 	bool checkCollision(float xPos, float zPos);
