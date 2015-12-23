@@ -28,8 +28,8 @@ terrain::terrain(int sizeX, int sizeZ, int height) {
 	this->height = height;
     endPos = new SF3dVector();
 
-	verts = new vector<vertex3D>((sizeX+1)*(sizeZ+1));
-	faces = new vector<faces3D>(sizeX*sizeZ);
+	/* verts = new vector<vertex3D>((sizeX+1)*(sizeZ+1)); */
+	/* faces = new vector<faces3D>(sizeX*sizeZ); */
 	faceNormals = new vector<vertex3D>(faces->size());
 	vertexNormals = new vector<vertex3D>(verts->size());
 
@@ -47,11 +47,21 @@ terrain::terrain(int sizeX, int sizeZ, int height) {
 		}
 	}
 }
+// deconstructor
 terrain::~terrain(){
+  //delete the end pos vector
   delete endPos;
+
+  //delete the maze height array
   for(int i = 0; i < sizeX; i++)
     delete[] mazeHeightMap[i];
   delete[] mazeHeightMap;
+
+  // delete the private vectors used for drawing
+  delete verts;
+  delete faces;
+  delete faceNormals;
+  delete vertexNormals;
 
 }
 // Load the maze terrain
