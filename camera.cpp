@@ -105,6 +105,8 @@ CCamera::CCamera()
 	mouseX = 0;
 	oldMouseX = 0;
 }
+//looks like the camera deconstructor does not need to delete anything
+CCamera::~CCamera(){}
 
 void CCamera::MoveWithMouse(int x) {
 	mouseX = x - 300;
