@@ -28,8 +28,8 @@ terrain::terrain(int sizeX, int sizeZ, int height) {
 	this->height = height;
     endPos = new SF3dVector();
 
-	/* verts = new vector<vertex3D>((sizeX+1)*(sizeZ+1)); */
-	/* faces = new vector<faces3D>(sizeX*sizeZ); */
+	verts = new vector<vertex3D>((sizeX+1)*(sizeZ+1));
+	faces = new vector<faces3D>(sizeX*sizeZ);
 	faceNormals = new vector<vertex3D>(faces->size());
 	vertexNormals = new vector<vertex3D>(verts->size());
 
